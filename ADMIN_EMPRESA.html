@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="./libs/geoapify-autocomplete.css" />
+    <link rel="stylesheet" href="./libs/minimal-dark.css" />
     <script src="./libs/geoapify-autocomplete.min.js"></script>
     <style>
         body, html { background-color: #000; }
@@ -211,14 +211,20 @@
         let companyUsersCache = [];
         let currentManagingCompany = { id: null, name: null };
 
-
         // ========================================================================
         // FUNÇÃO ATUALIZADA - initAutocomplete (Usa Geoapify via arquivo local)
         // ========================================================================
         function initAutocomplete(inputElement) {
             if (!inputElement) return;
+            // Espera que o objeto Autocomplete exista (definido pelo script local)
             if (typeof Autocomplete === 'undefined') {
-                console.error("ERRO: Biblioteca Autocomplete (Geoapify) não foi definida. Verifique o carregamento do script local.");
+                console.error("ERRO: Biblioteca Autocomplete (Geoapify) não definida. Verifique o carregamento do script local.");
+                // Adiciona um aviso visual ao lado do input
+                const errorSpan = document.createElement('span');
+                errorSpan.textContent = ' (Erro Autocomplete)';
+                errorSpan.style.color = 'red';
+                errorSpan.style.fontSize = '0.8em';
+                inputElement.parentElement.appendChild(errorSpan);
                 return;
             }
 
@@ -254,7 +260,7 @@
                      const parsed = JSON.parse(str);
                      if (Array.isArray(parsed)) {
                          if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null && 'address' in parsed[0]) {
-                            return parsed.filter(d => d.address); // Retorna objetos válidos
+                            return parsed.filter(d => d.address);
                          }
                           return parsed.map((addr, index) => ({
                               name: index === parsed.length - 1 ? 'Destino Final' : `Parada ${index + 1}`,
@@ -267,7 +273,6 @@
               return cleanedAddr ? [{ name: 'Destino', address: cleanedAddr }] : [];
         }
 
-        // --- Restante do JavaScript (sem alterações significativas, exceto chamadas a initAutocomplete) ---
        
         function resetAdminForm() {
             document.getElementById('passenger-quantity-select').value = '';
@@ -276,19 +281,19 @@
             document.getElementById('admin-observation').value = '';
         }
 
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-            document.getElementById(screenId)?.classList.add('active');
+        function showScreen(screenId) { 
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active')); 
+            document.getElementById(screenId)?.classList.add('active'); 
         }
-
-        function logout() {
-            state.loggedInCompany = null;
+       
+        function logout() { 
+            state.loggedInCompany = null; 
             state.loggedInAdmin = null;
             document.getElementById('admin-username-input').value = '';
-            document.getElementById('admin-password-input').value = '';
-            document.getElementById('super-admin-password-input').value = '';
+            document.getElementById('admin-password-input').value = ''; 
+            document.getElementById('super-admin-password-input').value = ''; 
             resetAdminForm();
-            showScreen('company-login-screen');
+            showScreen('company-login-screen'); 
         }
 
         function showSuperAdminLogin() {
@@ -341,7 +346,7 @@
                 document.getElementById('admin-password-input').value = '';
             }
         }
-
+        
         async function refreshAllUsers() {
             const { data: users, error: usersError } = await supabaseClient.from('users').select('id, name, company, address');
             if (usersError) { console.error("Erro refreshAllUsers:", usersError); return; }
@@ -360,7 +365,10 @@
             document.querySelectorAll('.admin-sub-screen').forEach(scr => scr.classList.remove('active'));
             document.getElementById('request-ride-screen').classList.add('active');
         }
-
+        
+        // ========================================================================
+        // FUNÇÃO CORRIGIDA - handlePassengerQuantityChange (Usa requestAnimationFrame)
+        // ========================================================================
         function handlePassengerQuantityChange(event) {
             const quantity = parseInt(event.target.value, 10);
             const container = document.getElementById('collaborators-container');
@@ -412,7 +420,7 @@
                  });
             });
         }
-
+        
         function handleCollaboratorSelection(event) {
             const selectedUserId = event.target.value;
             const index = event.target.dataset.index;
@@ -497,7 +505,7 @@
             if (!data || data.length === 0) { select.innerHTML = '<option value="">Nenhuma empresa</option>'; return; }
             select.innerHTML = '<option value="">-- Selecione --</option>' + data.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
         }
-
+       
         function showAdminSubScreen(subScreenId) {
             document.querySelectorAll('.admin-sub-screen').forEach(screen => screen.classList.remove('active'));
             document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
@@ -512,12 +520,15 @@
                 tabToActivateId = 'tab-history'; loadHistoryRides();
             } else if (subScreenId === 'user-management-screen') {
                 tabToActivateId = 'tab-users'; loadCompanyUsers();
-                initAutocomplete(document.getElementById('new-user-address')); // Init autocomplete here
+                // Inicializa autocomplete no form de adicionar/editar usuário
+                // Verifica se o elemento existe antes de inicializar
+                const newUserAddressInput = document.getElementById('new-user-address');
+                if (newUserAddressInput) initAutocomplete(newUserAddressInput);
             }
             const tabToActivate = document.getElementById(tabToActivateId);
             if (tabToActivate) tabToActivate.classList.add('active');
         }
-
+       
         async function loadPendingRides() { /* ... (código existente sem alterações) ... */ }
         async function loadHistoryRides() { /* ... (código existente sem alterações) ... */ }
         async function approveRide(rideId) { /* ... (código existente sem alterações) ... */ }
@@ -525,6 +536,15 @@
         
         // --- initApp e subscriptions (sem alterações significativas) ---
         function initApp() {
+            // Verifica se a biblioteca Autocomplete foi carregada APENAS UMA VEZ no início
+            if (typeof Autocomplete === 'undefined') {
+                 console.error("ERRO FATAL: Biblioteca Autocomplete (Geoapify) não carregada. Verifique se os arquivos locais estão corretos e foram deployados.");
+                 // Opcional: Mostrar um erro para o usuário
+                 // alert("Erro crítico ao carregar componente de endereço. Funcionalidade limitada.");
+            } else {
+                 console.log("Biblioteca Autocomplete carregada com sucesso.");
+            }
+
             populateLoginCompanies();
             document.getElementById('admin-request-immediate-btn').onclick = () => { adminSelectedRequestType = 'immediate'; adminScheduledDateTime = null; adminRequestRide(); };
             document.getElementById('admin-request-scheduled-btn').onclick = openAdminScheduleModal;
@@ -547,11 +567,10 @@
         async function addOrUpdateCompanyAdmin() { /* ... (código existente) ... */ }
         async function deleteCompanyAdmin(id, username) { /* ... (código existente) ... */ }
         async function loadCompanyUsers() { /* ... (código existente) ... */ }
-        function editUserById(userId) { /* ... (código existente) ... */ }
-        function cancelUserEdit() { /* ... (código existente) ... */ }
+        function editUserById(userId) { /* ... (código existente - a chamada initAutocomplete já está lá) ... */ }
+        function cancelUserEdit() { /* ... (código existente - a chamada initAutocomplete já está lá) ... */ }
         async function addOrUpdateUser() { /* ... (código existente) ... */ }
         async function deleteUser(id, name) { /* ... (código existente) ... */ }
     </script>
 </body>
 </html>
-
