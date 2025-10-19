@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Geoapify Corrigido</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/geoapify-autocomplete.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
+    <title>Teste Geoapify (Sem CSS Externo)</title>
+    <script src="https://unpkg.com/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
 
     <style>
-        /* Estilos CSS (permanecem os mesmos) */
         body { background-color: #1f2937; color: white; padding: 20px; font-family: sans-serif; }
         input { width: 90%; padding: 8px; margin-bottom: 15px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 4px; }
         .autocomplete-container { position: relative; margin-bottom: 20px; }
-        /* Estilos inline para o dropdown */
-        .geoapify-autocomplete-items { position: absolute; left: 0; right: 0; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-top: none; border-radius: 0 0 4px 4px; color: white !important; z-index: 1000 !important; max-height: 250px; overflow-y: auto; margin-top: -1px; }
+        /* Estilos INLINE MÍNIMOS para o dropdown */
+        .geoapify-autocomplete-items {
+            position: absolute; left: 0; right: 0;
+            background-color: #374151 !important;
+            border: 1px solid #4b5563 !important; border-top: none;
+            border-radius: 0 0 4px 4px;
+            color: white !important; z-index: 1000 !important;
+            max-height: 250px; overflow-y: auto; margin-top: -1px;
+        }
         .geoapify-autocomplete-items div { padding: 10px !important; cursor: pointer; font-size: 14px; color: white !important; }
         .geoapify-autocomplete-items div:hover { background-color: #4b5563 !important; }
         .geoapify-autocomplete-item.active { background-color: #00ffff !important; color: black !important; }
@@ -24,7 +29,7 @@
 </head>
 <body>
 
-    <h1>Teste Geoapify Autocomplete</h1>
+    <h1>Teste Geoapify Autocomplete (Sem CSS Externo)</h1>
 
     <div class="autocomplete-container">
         <label for="origem-teste">Origem:</label>
@@ -45,37 +50,40 @@
             const geoapifyApiKey = '3bd73ecada1d478a8c9473ad4115be38'; // Sua chave API
 
             // Verifica se a biblioteca Autocomplete foi definida
-            if (typeof Autocomplete !== 'undefined') {
-                statusDiv.textContent = "Biblioteca JS detectada. Inicializando...";
-                console.log("Biblioteca Autocomplete DEFINIDA. Inicializando...");
+            // Adiciona um pequeno delay para dar mais tempo ao script externo carregar
+            setTimeout(() => {
+                if (typeof Autocomplete !== 'undefined') {
+                    statusDiv.textContent = "Biblioteca JS detectada. Inicializando...";
+                    console.log("Biblioteca Autocomplete DEFINIDA. Inicializando...");
 
-                try {
-                    // Inicializa Origem
-                    new Autocomplete(document.getElementById('origem-teste'), {
-                        apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt'
-                    });
-                    console.log("Autocomplete Origem OK.");
+                    try {
+                        // Inicializa Origem
+                        new Autocomplete(document.getElementById('origem-teste'), {
+                            apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt'
+                        });
+                        console.log("Autocomplete Origem OK.");
 
-                    // Inicializa Destino
-                    new Autocomplete(document.getElementById('destino-teste'), {
-                        apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt'
-                    });
-                    console.log("Autocomplete Destino OK.");
+                        // Inicializa Destino
+                        new Autocomplete(document.getElementById('destino-teste'), {
+                            apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt'
+                        });
+                        console.log("Autocomplete Destino OK.");
 
-                    statusDiv.textContent = "Autocomplete inicializado com sucesso! Teste a digitação.";
-                    statusDiv.style.color = "#22c55e"; // Verde
+                        statusDiv.textContent = "Autocomplete inicializado! Teste a digitação.";
+                        statusDiv.style.color = "#22c55e"; // Verde
 
-                } catch (e) {
-                    console.error("Erro DURANTE a inicialização do Autocomplete:", e);
-                    statusDiv.textContent = "ERRO ao inicializar Autocomplete (pós-carregamento). Verifique o console.";
+                    } catch (e) {
+                        console.error("Erro DURANTE a inicialização do Autocomplete:", e);
+                        statusDiv.textContent = "ERRO ao inicializar Autocomplete (pós-carregamento). Verifique o console.";
+                        statusDiv.style.color = "#ef4444"; // Vermelho
+                    }
+
+                } else {
+                    console.error("ERRO CRÍTICO: A biblioteca Autocomplete NÃO está definida após window.onload e delay.");
+                    statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete JS não carregou/definiu 'Autocomplete'. Verifique Console/Rede.";
                     statusDiv.style.color = "#ef4444"; // Vermelho
                 }
-
-            } else {
-                console.error("ERRO CRÍTICO: A biblioteca Autocomplete NÃO está definida após window.onload.");
-                statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete JS não carregou. Verifique Console/Rede.";
-                statusDiv.style.color = "#ef4444"; // Vermelho
-            }
+            }, 200); // Delay de 200ms
         });
     </script>
 
