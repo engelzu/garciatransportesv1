@@ -10,51 +10,55 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="./libs/minimal-dark.css" />
+    <script src="./libs/geoapify-autocomplete.min.js"></script>
     <style>
         body, html { background-color: #000; }
         .main-gradient { background: linear-gradient(135deg, #000000, #000000); }
-        .button-gradient { background: linear-gradient(to right, #000000, #000000); border: 2px solid white; position: relative; overflow: hidden; color: white !important; }
+        .button-gradient { background: linear-gradient(to right, #000000, #000000); border: 2px solid white; position: relative; overflow: hidden; color: white !important; } /* Garante texto branco */
         .button-gradient::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(255,255,255,0)); transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         .button-gradient:hover::before { transform: translateX(0); }
-        .card-gradient { background: linear-gradient(135deg, #000000, #000000); border: 1px solid #4b5563; }
+        .card-gradient { background: linear-gradient(135deg, #000000, #000000); border: 1px solid #4b5563; } /* Adiciona borda sutil */
         .screen { display: none; background-color: #000; }
         .screen.active { display: block; }
         .text-black, .text-gray-800, .text-gray-400, .text-gray-300, .text-gray-600, .text-gray-700, .text-gray-500, .text-green-300, .text-yellow-300 { color: #ffffff !important; }
         .text-cyan-400 { color: #00ffff !important; }
         h1, h2, h3, p, button, label, input::placeholder, textarea::placeholder, select, option { color: #ffffff !important; }
-        input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
-        input:focus, select:focus, textarea:focus { border-color: #00ffff !important; ring: none !important; outline: none !important; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5) !important; }
+        input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; /* Garante texto branco */}
+        input:focus, select:focus, textarea:focus { border-color: #00ffff !important; ring: none !important; outline: none !important; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5) !important; } /* Foco ciano */
         #company-password-input { font-size: 14px; text-align: center; }
         #company-password-input::placeholder { text-align: center; }
         #app-container { position: relative; }
         #admin-access-icon:hover svg { stroke: #fff; }
 
-        /* ESTILO PARA A LISTA DE SUGESTÕES MANUAL */
-        .autocomplete-container { position: relative; } /* Necessário */
-        .suggestions-list {
-            position: absolute; left: 0; right: 0; /* Ocupa largura do container */
-            background-color: #374151;
-            border: 1px solid #4b5563; border-top: none;
-            border-radius: 0 0 0.5rem 0.5rem; /* rounded-lg */
-            color: white; z-index: 1050;
-            max-height: 200px; overflow-y: auto; margin-top: -1px;
-            display: none; /* Começa escondido */
+        /* ESTILO PARA O AUTOCOMPLETE DO GEOAPIFY (usando arquivo local) */
+        .autocomplete-container { position: relative; }
+        /* A aparencia virá do arquivo CSS local, mas podemos adicionar overrides aqui se necessário */
+        .geoapify-autocomplete-input {
+             /* Seus estilos existentes para inputs serão aplicados pela biblioteca */
+             width: 100% !important; /* Garante largura total */
+             box-sizing: border-box !important;
         }
-        .suggestion-item {
-            padding: 8px; /* p-2 */ cursor: pointer; font-size: 14px;
-            border-bottom: 1px solid #4b5563;
+        .geoapify-autocomplete-items {
+            background-color: #374151 !important; /* Fundo escuro */
+            border: 1px solid #4b5563 !important;
+            color: white !important;
+            z-index: 1050 !important;
+            max-height: 200px; overflow-y: auto;
         }
-         .suggestion-item:last-child { border-bottom: none; }
-        .suggestion-item:hover { background-color: #4b5563; }
-        /* FIM DO ESTILO DA LISTA */
+        .geoapify-autocomplete-items div:hover { background-color: #4b5563 !important; } /* Hover */
+        .geoapify-autocomplete-item.active { background-color: #00ffff !important; color: black !important; } /* Selecionado */
+        /* FIM DO ESTILO DO AUTOCOMPLETE */
 
         #schedule-modal { display: none; }
         #schedule-modal.flex { display: flex; }
 
-        .tab-button { background-color: #374151; border: 1px solid #4b5563; padding: 10px 15px; cursor: pointer; transition: all 0.2s ease-in-out; border-radius: 8px; font-weight: 600; }
+        /* --- CSS PARA ABAS --- */
+        .tab-button { background-color: #374151; border: 1px solid #4b5563; padding: 10px 15px; cursor: pointer; transition: all 0.2s ease-in-out; border-radius: 8px; font-weight: 600; color: white !important; }
         .tab-button.active { background-color: #00ffff; color: #000 !important; border-color: #00ffff; }
         .admin-sub-screen { display: none; }
         .admin-sub-screen.active { display: block; }
+
     </style>
 </head>
 <body class="main-gradient text-white min-h-screen flex items-start justify-center p-4 pt-8">
@@ -96,9 +100,8 @@
                 <button id="tab-history" class="tab-button" onclick="showAdminSubScreen('history-screen')">Histórico</button>
                 <button id="tab-users" class="tab-button" onclick="showAdminSubScreen('user-management-screen')">Gerenciar Usuários</button>
             </div>
-
             <div id="request-ride-screen" class="admin-sub-screen active">
-                 <h2 class="text-2xl font-bold text-center mb-4">Solicitar Corrida</h2>
+                <h2 class="text-2xl font-bold text-center mb-4">Solicitar Corrida</h2>
                 <div id="admin-request-form" class="card-gradient p-6 rounded-lg">
                     <div class="mb-4">
                         <label for="passenger-quantity-select" class="block mb-2 text-sm font-medium">SELECIONE A QUANTIDADE DE PASSAGEIROS</label>
@@ -110,8 +113,7 @@
                             <option value="4">4 Passageiros</option>
                         </select>
                     </div>
-                    <div id="collaborators-container" class="space-y-4">
-                        </div>
+                    <div id="collaborators-container" class="space-y-4"></div>
                     <div id="admin-ride-details" class="hidden">
                         <hr class="border-gray-600 my-6">
                         <h3 class="text-lg font-semibold mb-4 text-center">Detalhes da Viagem</h3>
@@ -126,7 +128,6 @@
                     </div>
                 </div>
             </div>
-
             <div id="approval-ride-screen" class="admin-sub-screen">
                 <h2 class="text-2xl font-bold text-center mb-4">Aprovar Solicitações Pendentes</h2>
                 <div id="pending-rides-container" class="space-y-4"></div>
@@ -135,7 +136,6 @@
                 <h2 class="text-2xl font-bold text-center mb-4">Histórico de Corridas</h2>
                 <div id="history-rides-container" class="space-y-4"></div>
             </div>
-
             <div id="user-management-screen" class="admin-sub-screen">
                 <h2 class="text-2xl font-bold text-center mb-4">Gerenciar Usuários</h2>
                 <div class="card-gradient p-4 rounded-lg mb-6">
@@ -145,8 +145,8 @@
                         <input type="text" id="new-user-matricula" placeholder="Matrícula" class="w-full p-2 rounded-lg">
                         <input type="text" id="new-user-name" placeholder="Nome Completo" class="w-full p-2 rounded-lg">
                         <div class="autocomplete-container">
-                            <label for="new-user-address" class="sr-only">Endereço</label> <input type="text" id="new-user-address" placeholder="Endereço" class="w-full p-2 rounded-lg">
-                            <div id="suggestions-new-user-address" class="suggestions-list"></div> </div>
+                            <input type="text" id="new-user-address" placeholder="Endereço" class="w-full p-2 rounded-lg">
+                        </div>
                         <input type="tel" id="new-user-phone" placeholder="Telefone" class="w-full p-2 rounded-lg">
                         <input type="text" id="new-user-password" placeholder="Senha" class="w-full p-2 rounded-lg">
                     </div>
@@ -201,7 +201,7 @@
         // ========================================================================
         const SUPABASE_URL = 'https://jowsbmuqbzxukbbxbeqv.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvd3NibXVxYnp4dWtiYnhiZXF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzA5NjQsImV4cCI6MjA3MTA0Njk2NH0.UMW2aQmuq0RiEHgody5StKEQzDjrKZnfUprDgDaMd1w';
-        const GEOAPIFY_API_KEY = '3bd73ecada1d478a8c9473ad4115be38';
+        const GEOAPIFY_API_KEY = '3bd73ecada1d478a8c9473ad4115be38'; // Sua chave Geoapify
        
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
        
@@ -210,138 +210,107 @@
         let adminScheduledDateTime = null;
         let companyUsersCache = [];
         let currentManagingCompany = { id: null, name: null };
-        let debounceTimeout; // Para debouncing das chamadas fetch
 
         // ========================================================================
-        // NOVA FUNÇÃO - fetchSuggestions (Usa Fetch API)
-        // ========================================================================
-        async function fetchSuggestions(query, suggestionsListElement, inputElement) {
-            if (query.length < 3) { // Não busca com menos de 3 caracteres
-                suggestionsListElement.innerHTML = '';
-                suggestionsListElement.style.display = 'none';
-                return;
-            }
-
-            const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&apiKey=${GEOAPIFY_API_KEY}&filter=countrycode:br&lang=pt`;
-
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-
-                suggestionsListElement.innerHTML = ''; // Limpa sugestões antigas
-
-                if (data.features && data.features.length > 0) {
-                    data.features.forEach(feature => {
-                        const suggestionDiv = document.createElement('div');
-                        suggestionDiv.textContent = feature.properties.formatted;
-                        suggestionDiv.className = 'suggestion-item';
-                        // Guarda os dados se precisar (opcional aqui)
-                        // suggestionDiv.dataset.feature = JSON.stringify(feature);
-
-                        suggestionDiv.addEventListener('click', () => {
-                            inputElement.value = feature.properties.formatted; // Preenche o input
-                            suggestionsListElement.innerHTML = ''; // Limpa
-                            suggestionsListElement.style.display = 'none'; // Esconde
-                            console.log("Selecionado:", feature.properties.formatted);
-                            // Opcional: chamar alguma função após selecionar
-                        });
-                        suggestionsListElement.appendChild(suggestionDiv);
-                    });
-                    suggestionsListElement.style.display = 'block'; // Mostra a lista
-                } else {
-                    suggestionsListElement.style.display = 'none'; // Esconde se não houver resultados
-                }
-            } catch (error) {
-                console.error("Erro ao buscar sugestões Geoapify:", error);
-                suggestionsListElement.innerHTML = '';
-                suggestionsListElement.style.display = 'none';
-            }
-        }
-
-        // ========================================================================
-        // FUNÇÃO ATUALIZADA - initAutocomplete (Agora usa Fetch API)
+        // FUNÇÃO ATUALIZADA - initAutocomplete (com logs de depuração)
         // ========================================================================
         function initAutocomplete(inputElement) {
+            console.log("Chamando initAutocomplete para:", inputElement ? inputElement.id : 'Elemento Nulo'); // LOG 1
+
             if (!inputElement) return;
 
-            // Encontra o elemento da lista de sugestões associado (assumindo ID padrão)
-            const suggestionsListId = `suggestions-${inputElement.id}`;
-            const suggestionsListElement = document.getElementById(suggestionsListId);
-            if (!suggestionsListElement) {
-                 console.warn(`Elemento de lista de sugestões #${suggestionsListId} não encontrado para o input #${inputElement.id}`);
-                 // Cria o elemento da lista dinamicamente se não existir
-                 const listDiv = document.createElement('div');
-                 listDiv.id = suggestionsListId;
-                 listDiv.className = 'suggestions-list';
-                 inputElement.parentNode.appendChild(listDiv); // Adiciona após o input
-                 // return; // Pode retornar ou tentar continuar
+            // Verifica ANTES de tentar usar
+            if (typeof Autocomplete === 'undefined') {
+                console.error("ERRO DENTRO de initAutocomplete: Biblioteca Autocomplete (Geoapify) não definida. Input ID:", inputElement.id); // LOG 2
+                // Adiciona aviso visual
+                const errorSpan = document.createElement('span');
+                errorSpan.textContent = ' (Erro Autocomplete Init)';
+                errorSpan.style.color = 'red';
+                errorSpan.style.fontSize = '0.7em';
+                 if (inputElement.parentElement && inputElement.parentElement.classList.contains('autocomplete-container')) {
+                     // Verifica se já existe um span de erro para não duplicar
+                     if (!inputElement.parentElement.querySelector('.autocomplete-error-span')) {
+                          errorSpan.className = 'autocomplete-error-span'; // Adiciona classe para identificar
+                          inputElement.parentElement.appendChild(errorSpan);
+                     }
+                 } else {
+                     console.warn("Não foi possível adicionar span de erro visualmente para", inputElement.id);
+                 }
+                return; // Impede a continuação
             }
-            const actualSuggestionsListElement = document.getElementById(suggestionsListId); // Pega novamente
 
-            // Remove listener antigo para evitar duplicatas
-            inputElement.removeEventListener('input', handleAutocompleteInput);
-            inputElement.removeEventListener('focus', handleAutocompleteFocus); // Adiciona listener de foco
+            // Remove instância anterior
+            if (inputElement.geoapify_autocomplete_instance) {
+                try { inputElement.geoapify_autocomplete_instance.destroy(); } catch(e) {}
+                inputElement.geoapify_autocomplete_instance = null;
+            }
 
-            // Adiciona novo listener
-            inputElement.addEventListener('input', handleAutocompleteInput);
-             inputElement.addEventListener('focus', handleAutocompleteFocus); // Mostra ao focar se tiver texto
+            // Tenta inicializar
+            try {
+                const autocomplete = new Autocomplete(inputElement, {
+                    apiKey: GEOAPIFY_API_KEY,
+                    filter: { countrycode: ['br'] },
+                    lang: 'pt',
+                    placeholder: inputElement.placeholder,
+                    allowNonVerifiedHouseNumber: true,
+                    allowNonVerifiedStreet: true
+                });
+                inputElement.geoapify_autocomplete_instance = autocomplete;
+                console.log("SUCESSO: Autocomplete inicializado para:", inputElement.id); // LOG 3
 
-             // Armazena a referência da lista no input para fácil acesso
-             inputElement.suggestionsListElement = actualSuggestionsListElement;
-
-        }
-
-        // Handler para o evento 'input'
-        function handleAutocompleteInput(event) {
-            clearTimeout(debounceTimeout);
-            const inputElement = event.target;
-            const suggestionsListElement = inputElement.suggestionsListElement;
-            const query = inputElement.value;
-
-            if (suggestionsListElement) {
-                 debounceTimeout = setTimeout(() => {
-                    fetchSuggestions(query, suggestionsListElement, inputElement);
-                }, 300); // Debounce de 300ms
+            } catch (error) {
+                console.error("Erro EXCEPCIONAL ao criar Autocomplete:", error, "no elemento:", inputElement); // LOG 4
+                 // Adiciona aviso visual em caso de exceção
+                 const errorSpan = document.createElement('span');
+                 errorSpan.textContent = ' (Erro Excepcional Init)';
+                 errorSpan.style.color = 'orange';
+                 errorSpan.style.fontSize = '0.7em';
+                 if (inputElement.parentElement && inputElement.parentElement.classList.contains('autocomplete-container')) {
+                     if (!inputElement.parentElement.querySelector('.autocomplete-error-span')) { // Evita duplicar
+                          errorSpan.className = 'autocomplete-error-span';
+                          inputElement.parentElement.appendChild(errorSpan);
+                     }
+                 }
             }
         }
         
-        // Handler para o evento 'focus' (opcional, para reabrir a lista)
-        function handleAutocompleteFocus(event) {
-            const inputElement = event.target;
-            const suggestionsListElement = inputElement.suggestionsListElement;
-            if (inputElement.value.length >= 3 && suggestionsListElement && suggestionsListElement.children.length > 0) {
-                 suggestionsListElement.style.display = 'block';
-            }
+        // ========================================================================
+        // FUNÇÃO parseDestinations (sem alterações)
+        // ========================================================================
+        function parseDestinations(destinationString) {
+             if (!destinationString || typeof destinationString !== 'string') return [];
+             const str = destinationString.trim();
+             if (str.startsWith('[') && str.endsWith(']')) {
+                 try {
+                     const parsed = JSON.parse(str);
+                     if (Array.isArray(parsed)) {
+                         if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null && 'address' in parsed[0]) {
+                            return parsed.filter(d => d.address);
+                         }
+                          return parsed.map((addr, index) => ({
+                              name: index === parsed.length - 1 ? 'Destino Final' : `Parada ${index + 1}`,
+                              address: String(addr || '').trim()
+                          })).filter(d => d.address);
+                     }
+                 } catch (e) { console.warn('parseDestinations: JSON inválido.', str, e); }
+             }
+              const cleanedAddr = str.replace(/^\["|"\]$/g, '').trim();
+              return cleanedAddr ? [{ name: 'Destino', address: cleanedAddr }] : [];
         }
 
-        // Listener global para fechar listas ao clicar fora
-        document.addEventListener('click', (event) => {
-            document.querySelectorAll('.autocomplete-container').forEach(container => {
-                if (!container.contains(event.target)) {
-                    const list = container.querySelector('.suggestions-list');
-                    if (list) list.style.display = 'none';
-                }
-            });
-        });
-
-
-        // ========================================================================
-        // FUNÇÃO ATUALIZADA - parseDestinations
-        // ========================================================================
-        function parseDestinations(destinationString) { /* ... (código igual anterior) ... */ }
+        // --- Restante do JavaScript (sem alterações significativas) ---
        
-        function resetAdminForm() { /* ... (código igual anterior) ... */ }
-        function showScreen(screenId) { /* ... (código igual anterior) ... */ }
-        function logout() { /* ... (código igual anterior) ... */ }
-        function showSuperAdminLogin() { /* ... (código igual anterior) ... */ }
-        async function verifySuperAdminPassword() { /* ... (código igual anterior) ... */ }
-        async function verifyCompanyAdminPassword() { /* ... (código igual anterior) ... */ }
-        async function refreshAllUsers() { /* ... (código igual anterior) ... */ }
-        async function setupAdminScreen() { /* ... (código igual anterior) ... */ }
+        function resetAdminForm() { /* ... */ }
+        function showScreen(screenId) { /* ... */ }
+        function logout() { /* ... */ }
+        function showSuperAdminLogin() { /* ... */ }
+        async function verifySuperAdminPassword() { /* ... */ }
+        async function verifyCompanyAdminPassword() { /* ... */ }
+        async function refreshAllUsers() { /* ... */ }
+        async function setupAdminScreen() { /* ... */ }
         
         // ========================================================================
-        // FUNÇÃO ATUALIZADA - handlePassengerQuantityChange (Chama novo initAutocomplete)
+        // FUNÇÃO handlePassengerQuantityChange (Mantida com requestAnimationFrame)
         // ========================================================================
         function handlePassengerQuantityChange(event) {
             const quantity = parseInt(event.target.value, 10);
@@ -366,7 +335,7 @@
                         <div class="autocomplete-container">
                             <label for="address-input-${i}" class="block mb-1 text-xs font-medium">Endereço</label>
                             <input type="text" id="address-input-${i}" class="w-full p-2 rounded-lg" placeholder="Digite o endereço">
-                            <div id="suggestions-address-input-${i}" class="suggestions-list"></div> </div>
+                        </div>
                     </div>`;
             }
             inputsHtml += `
@@ -375,18 +344,19 @@
                     <div class="autocomplete-container">
                         <label for="address-input-destination" class="block mb-1 text-xs font-medium">Endereço de Destino</label>
                         <input type="text" id="address-input-destination" class="w-full p-2 rounded-lg" placeholder="Digite o endereço">
-                        <div id="suggestions-address-input-destination" class="suggestions-list"></div> </div>
+                    </div>
                 </div>`;
             container.innerHTML = inputsHtml;
             
             // Inicializa autocomplete APÓS renderizar
             requestAnimationFrame(() => {
+                console.log("requestAnimationFrame: Tentando inicializar autocompletes..."); // Log extra
                 for (let i = 0; i < quantity; i++) {
                     const inputElement = document.getElementById(`address-input-${i}`);
-                    if (inputElement) initAutocomplete(inputElement); // Chama a nova função
+                    if (inputElement) initAutocomplete(inputElement);
                 }
                 const destInputElement = document.getElementById('address-input-destination');
-                 if (destInputElement) initAutocomplete(destInputElement); // Chama a nova função
+                 if (destInputElement) initAutocomplete(destInputElement);
 
                  document.querySelectorAll('.collaborator-selector').forEach(select => {
                     select.removeEventListener('change', handleCollaboratorSelection);
@@ -395,17 +365,17 @@
             });
         }
         
-        function handleCollaboratorSelection(event) { /* ... (código igual anterior) ... */ }
-        function openAdminScheduleModal() { /* ... (código igual anterior) ... */ }
-        function closeScheduleModal() { /* ... (código igual anterior) ... */ }
-        function confirmAdminSchedule() { /* ... (código igual anterior) ... */ }
-        async function adminRequestRide() { /* ... (código igual anterior - validação de input ainda funciona) ... */ }
-        async function populateLoginCompanies() { /* ... (código igual anterior) ... */ }
+        function handleCollaboratorSelection(event) { /* ... */ }
+        function openAdminScheduleModal() { /* ... */ }
+        function closeScheduleModal() { /* ... */ }
+        function confirmAdminSchedule() { /* ... */ }
+        async function adminRequestRide() { /* ... */ }
+        async function populateLoginCompanies() { /* ... */ }
        
         function showAdminSubScreen(subScreenId) {
             document.querySelectorAll('.admin-sub-screen').forEach(screen => screen.classList.remove('active'));
             document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.getElementById(subScreenId).classList.add('active');
+            document.getElementById(subScreenId)?.classList.add('active'); // Adiciona verificação
             let tabToActivateId = '';
             if (subScreenId === 'request-ride-screen') {
                 tabToActivateId = 'tab-request-ride';
@@ -416,45 +386,54 @@
                 tabToActivateId = 'tab-history'; loadHistoryRides();
             } else if (subScreenId === 'user-management-screen') {
                 tabToActivateId = 'tab-users'; loadCompanyUsers();
-                // Inicializa autocomplete no form de adicionar/editar usuário
                 const newUserAddressInput = document.getElementById('new-user-address');
-                if (newUserAddressInput) initAutocomplete(newUserAddressInput); // Chama a nova função
+                if (newUserAddressInput) initAutocomplete(newUserAddressInput);
             }
             const tabToActivate = document.getElementById(tabToActivateId);
             if (tabToActivate) tabToActivate.classList.add('active');
         }
        
-        async function loadPendingRides() { /* ... (código igual anterior) ... */ }
-        async function loadHistoryRides() { /* ... (código igual anterior) ... */ }
-        async function approveRide(rideId) { /* ... (código igual anterior) ... */ }
-        async function rejectRide(rideId) { /* ... (código igual anterior) ... */ }
+        async function loadPendingRides() { /* ... */ }
+        async function loadHistoryRides() { /* ... */ }
+        async function approveRide(rideId) { /* ... */ }
+        async function rejectRide(rideId) { /* ... */ }
         
-        // --- initApp e subscriptions (sem alterações significativas) ---
+        // --- initApp e subscriptions ---
         function initApp() {
-            // REMOVIDA a verificação de 'Autocomplete' pois não usamos mais a biblioteca
-            console.log("Inicializando App...");
+             // Verifica se a biblioteca foi carregada APENAS UMA VEZ no início
+             console.log("Executando initApp..."); // Log inicial
+             if (typeof Autocomplete === 'undefined') {
+                  console.error("ERRO FATAL: Biblioteca Autocomplete (Geoapify) não carregada. Verifique se os arquivos locais (libs/geoapify-autocomplete.min.js) estão corretos e foram deployados.");
+                  // Tenta alertar o usuário, mas pode não funcionar dependendo do contexto
+                  // alert("Erro crítico ao carregar componente de endereço. Funcionalidade limitada.");
+             } else {
+                  console.log("Biblioteca Autocomplete detectada em initApp.");
+             }
+
             populateLoginCompanies();
             document.getElementById('admin-request-immediate-btn').onclick = () => { adminSelectedRequestType = 'immediate'; adminScheduledDateTime = null; adminRequestRide(); };
             document.getElementById('admin-request-scheduled-btn').onclick = openAdminScheduleModal;
+            
+             // Configura subscriptions
              supabaseClient.channel('public:rides').on('postgres_changes', { event: '*', schema: 'public', table: 'rides' }, async (payload) => { /* ... (código existente) ... */ }).subscribe();
              supabaseClient.channel('public:users').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async (payload) => { /* ... (código existente) ... */ }).subscribe();
              supabaseClient.channel('public:companies').on('postgres_changes', { event: '*', schema: 'public', table: 'companies' }, async (payload) => { /* ... (código existente) ... */ }).subscribe();
         }
-        document.addEventListener('DOMContentLoaded', initApp);
+        document.addEventListener('DOMContentLoaded', initApp); // Chama initApp após DOM carregar
 
-        // --- SUPER ADMIN CRUDs (sem alterações) ---
-        async function loadCompanyManagement() { /* ... (código existente) ... */ }
-        function editCompany(id, name) { /* ... (código existente) ... */ }
-        function cancelEdit() { /* ... (código existente) ... */ }
-        async function addOrUpdateCompany() { /* ... (código existente) ... */ }
-        async function deleteCompany(id, name) { /* ... (código existente) ... */ }
-        function manageAdminsForCompany(companyId, companyName) { /* ... (código existente) ... */ }
-        async function loadCompanyAdmins() { /* ... (código existente) ... */ }
-        function editCompanyAdmin(admin) { /* ... (código existente) ... */ }
-        function cancelCompanyAdminEdit() { /* ... (código existente) ... */ }
-        async function addOrUpdateCompanyAdmin() { /* ... (código existente) ... */ }
-        async function deleteCompanyAdmin(id, username) { /* ... (código existente) ... */ }
-        async function loadCompanyUsers() { /* ... (código existente) ... */ }
+        // --- SUPER ADMIN CRUDs ---
+        async function loadCompanyManagement() { /* ... */ }
+        function editCompany(id, name) { /* ... */ }
+        function cancelEdit() { /* ... */ }
+        async function addOrUpdateCompany() { /* ... */ }
+        async function deleteCompany(id, name) { /* ... */ }
+        function manageAdminsForCompany(companyId, companyName) { /* ... */ }
+        async function loadCompanyAdmins() { /* ... */ }
+        function editCompanyAdmin(admin) { /* ... */ }
+        function cancelCompanyAdminEdit() { /* ... */ }
+        async function addOrUpdateCompanyAdmin() { /* ... */ }
+        async function deleteCompanyAdmin(id, username) { /* ... */ }
+        async function loadCompanyUsers() { /* ... */ }
         
         function editUserById(userId) {
             const user = companyUsersCache.find(u => u.id === userId);
@@ -472,27 +451,27 @@
             
             // Inicializa autocomplete no campo de endereço
             const addressInput = document.getElementById('new-user-address');
-            if(addressInput) initAutocomplete(addressInput); // Chama a nova função
+            if(addressInput) initAutocomplete(addressInput); // Chama a função atualizada
         }
 
         function cancelUserEdit() {
-            document.getElementById('editing-user-id').value = '';
-            document.getElementById('new-user-matricula').value = '';
-            document.getElementById('new-user-name').value = '';
-            document.getElementById('new-user-address').value = '';
-            document.getElementById('new-user-phone').value = '';
-            document.getElementById('new-user-password').value = '';
-            document.getElementById('new-user-password').placeholder = 'Senha';
-            document.getElementById('cancel-user-edit-btn').classList.add('hidden');
-            document.getElementById('user-form-title').textContent = 'Adicionar Usuário';
-            
-            // Re-inicializa para o modo "adicionar"
+             document.getElementById('editing-user-id').value = '';
+             document.getElementById('new-user-matricula').value = '';
+             document.getElementById('new-user-name').value = '';
+             document.getElementById('new-user-address').value = '';
+             document.getElementById('new-user-phone').value = '';
+             document.getElementById('new-user-password').value = '';
+             document.getElementById('new-user-password').placeholder = 'Senha';
+             document.getElementById('cancel-user-edit-btn').classList.add('hidden');
+             document.getElementById('user-form-title').textContent = 'Adicionar Usuário';
+             
+             // Re-inicializa para o modo "adicionar"
              const addressInput = document.getElementById('new-user-address');
-             if(addressInput) initAutocomplete(addressInput); // Chama a nova função
+             if(addressInput) initAutocomplete(addressInput); // Chama a função atualizada
         }
         
-        async function addOrUpdateUser() { /* ... (código existente) ... */ }
-        async function deleteUser(id, name) { /* ... (código existente) ... */ }
+        async function addOrUpdateUser() { /* ... */ }
+        async function deleteUser(id, name) { /* ... */ }
     </script>
 </body>
 </html>
