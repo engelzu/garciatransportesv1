@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Geoapify (Sem CSS Externo)</title>
-    <script src="https://unpkg.com/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
+    <title>Teste Geoapify (JS Local / Sem CSS)</title>
+    <script src="./libs/geoapify-autocomplete.min.js"></script>
 
     <style>
+        /* Estilos CSS (permanecem os mesmos) */
         body { background-color: #1f2937; color: white; padding: 20px; font-family: sans-serif; }
         input { width: 90%; padding: 8px; margin-bottom: 15px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 4px; }
         .autocomplete-container { position: relative; margin-bottom: 20px; }
-        /* Estilos INLINE MÍNIMOS para o dropdown */
+        /* Estilos inline MÍNIMOS para o dropdown */
         .geoapify-autocomplete-items {
             position: absolute; left: 0; right: 0;
             background-color: #374151 !important;
@@ -29,7 +30,7 @@
 </head>
 <body>
 
-    <h1>Teste Geoapify Autocomplete (Sem CSS Externo)</h1>
+    <h1>Teste Geoapify Autocomplete (JS Local / Sem CSS Externo)</h1>
 
     <div class="autocomplete-container">
         <label for="origem-teste">Origem:</label>
@@ -53,7 +54,7 @@
             // Adiciona um pequeno delay para dar mais tempo ao script externo carregar
             setTimeout(() => {
                 if (typeof Autocomplete !== 'undefined') {
-                    statusDiv.textContent = "Biblioteca JS detectada. Inicializando...";
+                    statusDiv.textContent = "Biblioteca JS local detectada. Inicializando...";
                     console.log("Biblioteca Autocomplete DEFINIDA. Inicializando...");
 
                     try {
@@ -79,8 +80,8 @@
                     }
 
                 } else {
-                    console.error("ERRO CRÍTICO: A biblioteca Autocomplete NÃO está definida após window.onload e delay.");
-                    statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete JS não carregou/definiu 'Autocomplete'. Verifique Console/Rede.";
+                    console.error("ERRO CRÍTICO: A biblioteca Autocomplete (local) NÃO está definida após window.onload e delay.");
+                    statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete JS local não carregou/definiu 'Autocomplete'. Verifique Console/Rede.";
                     statusDiv.style.color = "#ef4444"; // Vermelho
                 }
             }, 200); // Delay de 200ms
