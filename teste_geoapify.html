@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Geoapify (JS Local / Sem CSS)</title>
+    <title>Teste Geoapify (Arquivos Locais)</title>
+    <link rel="stylesheet" href="./libs/geoapify-autocomplete.css" />
     <script src="./libs/geoapify-autocomplete.min.js"></script>
 
     <style>
@@ -11,15 +12,8 @@
         body { background-color: #1f2937; color: white; padding: 20px; font-family: sans-serif; }
         input { width: 90%; padding: 8px; margin-bottom: 15px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 4px; }
         .autocomplete-container { position: relative; margin-bottom: 20px; }
-        /* Estilos inline MÍNIMOS para o dropdown */
-        .geoapify-autocomplete-items {
-            position: absolute; left: 0; right: 0;
-            background-color: #374151 !important;
-            border: 1px solid #4b5563 !important; border-top: none;
-            border-radius: 0 0 4px 4px;
-            color: white !important; z-index: 1000 !important;
-            max-height: 250px; overflow-y: auto; margin-top: -1px;
-        }
+        /* Estilos inline MÍNIMOS para o dropdown (caso o CSS externo falhe, mas deve funcionar agora) */
+        .geoapify-autocomplete-items { position: absolute; left: 0; right: 0; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-top: none; border-radius: 0 0 4px 4px; color: white !important; z-index: 1000 !important; max-height: 250px; overflow-y: auto; margin-top: -1px; }
         .geoapify-autocomplete-items div { padding: 10px !important; cursor: pointer; font-size: 14px; color: white !important; }
         .geoapify-autocomplete-items div:hover { background-color: #4b5563 !important; }
         .geoapify-autocomplete-item.active { background-color: #00ffff !important; color: black !important; }
@@ -30,7 +24,7 @@
 </head>
 <body>
 
-    <h1>Teste Geoapify Autocomplete (JS Local / Sem CSS Externo)</h1>
+    <h1>Teste Geoapify Autocomplete (Arquivos Locais)</h1>
 
     <div class="autocomplete-container">
         <label for="origem-teste">Origem:</label>
@@ -51,7 +45,7 @@
             const geoapifyApiKey = '3bd73ecada1d478a8c9473ad4115be38'; // Sua chave API
 
             // Verifica se a biblioteca Autocomplete foi definida
-            // Adiciona um pequeno delay para dar mais tempo ao script externo carregar
+            // Adiciona um pequeno delay por segurança
             setTimeout(() => {
                 if (typeof Autocomplete !== 'undefined') {
                     statusDiv.textContent = "Biblioteca JS local detectada. Inicializando...";
@@ -70,7 +64,7 @@
                         });
                         console.log("Autocomplete Destino OK.");
 
-                        statusDiv.textContent = "Autocomplete inicializado! Teste a digitação.";
+                        statusDiv.textContent = "Autocomplete inicializado com sucesso! Teste a digitação.";
                         statusDiv.style.color = "#22c55e"; // Verde
 
                     } catch (e) {
@@ -84,7 +78,7 @@
                     statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete JS local não carregou/definiu 'Autocomplete'. Verifique Console/Rede.";
                     statusDiv.style.color = "#ef4444"; // Vermelho
                 }
-            }, 200); // Delay de 200ms
+            }, 100); // Delay de 100ms (pode ajustar se necessário)
         });
     </script>
 
