@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/themes/minimal.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@latest/styles/minimal-dark.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@latest/dist/index.min.js"></script>
     <style>
         body, html {
             background-color: #000;
@@ -68,14 +68,18 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
+        
         /* ESTILO PARA O AUTOCOMPLETE DO GEOAPIFY */
+        .autocomplete-container {
+            position: relative; /* Necessário para o dropdown */
+        }
+        /* A biblioteca minimal-dark.css cuida da maior parte, mas podemos forçar algumas cores */
         .geoapify-autocomplete-input {
              color: white !important;
              background-color: #374151 !important; /* Fundo do input */
              border: 1px solid #4b5563 !important;
-             padding: 0.75rem !important; /* Equivalente ao p-3 */
-             border-radius: 0.5rem !important; /* Equivalente ao rounded-lg */
+             padding: 0.75rem !important; /* p-3 */
+             border-radius: 0.5rem !important; /* rounded-lg */
         }
         .geoapify-autocomplete-items {
             background-color: #374151 !important; /* Fundo da lista dropdown */
@@ -93,10 +97,6 @@
         }
         .geoapify-autocomplete-item.active {
             background-color: #4f46e5 !important; /* Cor do item selecionado */
-        }
-        /* Ajuste container */
-        .autocomplete-container {
-            position: relative; /* Necessário para o dropdown */
         }
         /* FIM DO ESTILO DO AUTOCOMPLETE */
 
@@ -127,7 +127,7 @@
         h1, h2, h3, p, button, label, input::placeholder, textarea::placeholder, select {
             color: #ffffff !important;
         }
-
+       
         input, select, textarea {
             background-color: #374151 !important;
             border-color: #4b5563 !important;
@@ -146,7 +146,7 @@
         #menu-toggle-btn svg path {
             stroke: #ffffff !important;
         }
-
+        
         #user-login-screen button:first-child {
             color: #ffffff !important;
         }
@@ -167,10 +167,7 @@
             margin: 0 auto;
         }
 
-        #destination { /* Este ID não existe mais diretamente, mas mantemos caso precise */
-            width: 100%;
-            box-sizing: border-box;
-        }
+        /* Removido #destination obsoleto */
 
         #request-ride-btn {
             width: 100%;
@@ -179,18 +176,18 @@
 
         #intro-video {
             width: 100%;
-            height: 100vh;
-            object-fit: cover;
+            height: 100vh; 
+            object-fit: cover; 
         }
 
         #video-container {
-            position: fixed;
+            position: fixed; 
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 9999;
-            background-color: black;
+            z-index: 9999; 
+            background-color: black; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -201,7 +198,7 @@
             height: 60px;
             object-fit: contain;
         }
-
+        
         #user-id, #user-password {
             font-size: 14px;
             text-align: center;
@@ -239,7 +236,7 @@
         </nav>
     </div>
 
-    <div id="app-container" class="w-full max-w-md mx-auto relative hidden">
+    <div id="app-container" class="w-full max-w-md mx-auto relative hidden"> 
 
         <div id="initial-screen" class="screen active text-center">
             <div class="flex flex-col items-center justify-center mb-4">
@@ -256,10 +253,10 @@
                 </button>
             </div>
         </div>
-
+        
         <div id="user-login-screen" class="screen">
             <button onclick="showScreen('initial-screen')" class="mb-4 text-yellow-300">&larr; Voltar</button>
-
+            
             <img src="images/icone_passageiro.png" alt="Ícone do Passageiro" class="mx-auto" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 1rem;">
 
             <h2 class="text-3xl font-bold mb-6 text-center">Login do Passageiro</h2>
@@ -290,7 +287,7 @@
                 </button>
             </div>
             <p id="user-welcome-message" class="text-center text-xl text-gray-300 mb-4"></p>
-
+            
             <div id="permission-denied-message" class="hidden card-gradient p-4 rounded-lg mb-6 text-center text-yellow-300 border-2 border-yellow-400">
                 <p class="font-semibold text-lg">Permissão para solicitar corridas desabilitada.</p>
                 <p class="text-sm">Apenas um administrador pode solicitar uma viagem para você. Acompanhe o status aqui.</p>
@@ -302,7 +299,7 @@
                 <div id="status-icon-en-route" class="hidden mx-auto mb-2"></div>
                 <div id="status-icon-arrived-pickup" class="hidden mx-auto mb-2"></div>
                 <div id="status-icon-in-progress" class="hidden mx-auto mb-2"></div>
-
+                
                 <p id="user-status-message" class="mt-4 text-lg"></p>
                 <button id="silence-alert-btn" onclick="silenceAlert()" class="hidden mt-4 w-full py-2 px-4 font-semibold rounded-lg bg-blue-600 hover:bg-blue-700">SILENCIAR ALERTA</button>
                 <button id="edit-schedule-btn" onclick="openEditScheduleModal(state.currentUserRideId)" class="hidden mt-4 w-full py-2 px-4 font-semibold rounded-lg bg-yellow-500 hover:bg-yellow-600">ALTERAR AGENDAMENTO</button>
@@ -311,13 +308,12 @@
 
             <div id="user-request-form" class="card-gradient p-4 rounded-lg mb-6 content-wrapper">
                  <h3 class="text-center font-semibold mb-4 text-xl">Solicitar uma Viagem</h3>
-
-                <div class="mb-4 input-and-button-container autocomplete-container">
-                    <label for="origin" class="block mb-2 text-sm font-medium">Origem <span class="text-red-400">(Obrigatório)</span></label>
+                
+                <div class="mb-4 input-and-button-container autocomplete-container"> <label for="origin" class="block mb-2 text-sm font-medium">Origem <span class="text-red-400">(Obrigatório)</span></label>
                     <input type="text" id="origin" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none" placeholder="Digite o endereço de partida">
                     <button onclick="useCurrentLocation()" class="mt-2 w-full py-2 px-4 text-sm font-semibold rounded-lg bg-sky-600 hover:bg-sky-700">Usar minha localização atual</button>
                 </div>
-
+                
                 <div class="mb-4 input-and-button-container">
                     <label for="passenger-count" class="block mb-2 text-sm font-medium">Quantidade de Passageiros?</label>
                     <select id="passenger-count" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none">
@@ -329,12 +325,12 @@
                 </div>
 
                 <div id="destinations-container" class="w-full"></div>
-
+                
                 <div class="mb-4 input-and-button-container">
                     <label for="observation" class="block mb-2 text-sm font-medium">Observação (opcional)</label>
                     <textarea id="observation" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none" placeholder="Ex: Ponto de referência, necessidade especial..." maxlength="300" rows="3"></textarea>
                 </div>
-
+                
                 <div class="input-and-button-container">
                     <button id="request-ride-btn" class="w-full py-3 px-6 text-lg font-semibold rounded-lg button-gradient shadow-lg transform hover:scale-105 transition-transform">
                         SOLICITAR TAXI
@@ -372,11 +368,11 @@
             </div>
         </div>
     </div>
-
+    
     <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
-        <div class="card-gradient p-6 rounded-lg shadow-xl text-center w-full max-w-2xl max-h-[70vh] overflow-y-auto">
+        <div class="card-gradient p-6 rounded-lg shadow-xl text-center w-full max-w-2xl max-h-[70vh] overflow-y-auto"> 
             <h3 class="text-2xl font-bold mb-4 text-center">Histórico de Corridas</h3>
-            <div id="user-ride-history-modal" class="overflow-y-auto mb-6"></div>
+            <div id="user-ride-history-modal" class="overflow-y-auto mb-6"></div> 
             <div class="flex justify-center">
                 <button onclick="closeModal('history-modal');" class="py-2 px-6 font-semibold rounded-lg bg-gray-600 hover:bg-gray-700">Fechar</button>
             </div>
@@ -406,14 +402,14 @@
         // ========================================================================
         // NOVA CONSTANTE - CHAVE DA API GEOAPIFY
         // ========================================================================
-        const GEOAPIFY_API_KEY = '3bd73ecada1d478a8c9473ad4115be38';
+        const GEOAPIFY_API_KEY = '3bd73ecada1d478a8c9473ad4115be38'; //
 
         // --- CONFIGURAÇÃO INICIAL E ESTADO DA APLICAÇÃO ---
         let state = {
             rides: [],
             users: [],
-            appIcon: 'images/user.png',
-            currentUserRideId: localStorage.getItem('currentUserRideId') || null, // Carrega o ID da corrida do storage
+            appIcon: 'images/user.png', 
+            currentUserRideId: null, 
             currentUser: null,
             userStatusInterval: null,
             // Armazena os dados do local selecionado pelo autocomplete
@@ -422,13 +418,14 @@
         };
 
         // As variáveis abaixo não são mais diretamente do estado, mas controlam o fluxo da *próxima* requisição
+        // let selectedDestinations = []; // Removido, usaremos state.selectedDestinationsData
         let selectedObservation = '';
-        let selectedRequestType = '';
+        let selectedRequestType = ''; 
         let scheduledDateTime = null;
-        let isProcessingRequest = false;
+        let isProcessingRequest = false; 
 
         // --- CONFIGURAÇÃO DO SUPABASE ---
-        const SUPABASE_URL = 'https://jowsbmuqbzxukbbxbeqv.supabase.co';
+        const SUPABASE_URL = 'https://jowsbmuqbzxukbbxbeqv.supabase.co'; 
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impvd3NibXVxYnp4dWtiYnhiZXF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0NzA5NjQsImV4cCI6MjA3MTA0Njk2NH0.UMW2aQmuq0RiEHgody5StKEQzDjrKZnfUprDgDaMd1w';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -436,19 +433,19 @@
         function showModal(modalId, htmlContent, onConfirmCallback, showCancelButton = false) {
             const modal = document.getElementById(modalId);
             if (!modal) return;
-
+            
             const messageEl = modal.querySelector('#modal-message');
             if(messageEl && typeof htmlContent === 'string') {
                 messageEl.textContent = htmlContent;
             }
-
+            
             const confirmBtn = modal.querySelector('#modal-confirm');
             const cancelBtn = modal.querySelector('#modal-cancel');
 
             if (confirmBtn) {
-                confirmBtn.onclick = () => {
-                    if (onConfirmCallback) onConfirmCallback();
-                    closeModal(modalId);
+                confirmBtn.onclick = () => { 
+                    if (onConfirmCallback) onConfirmCallback(); 
+                    closeModal(modalId); 
                 };
             }
 
@@ -458,14 +455,14 @@
                     cancelBtn.onclick = () => closeModal(modalId);
                 }
             }
-
+            
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
 
         function closeModal(modalId = 'modal') {
             const modal = document.getElementById(modalId);
-            if (!modal) return;
+            if (!modal) return; 
 
             modal.classList.add('hidden');
             modal.classList.remove('flex');
@@ -476,7 +473,7 @@
                 confirmBtn.onclick = confirmSchedule;
             }
         }
-
+        
         // --- LÓGICA DO MENU SANDUÍCHE --- (sem alterações)
         function toggleMenu() {
             const menu = document.getElementById('mobile-menu');
@@ -503,24 +500,23 @@
                 .eq('matricula', matricula)
                 .eq('password', password)
                 .single();
-
-            if (error && error.code !== 'PGRST116') {
+            
+            if (error && error.code !== 'PGRST116') { 
                 console.error('Erro no Supabase ao tentar login:', error);
                 errorEl.textContent = 'Erro de comunicação com o servidor. Por favor, tente novamente.';
                 errorEl.classList.remove('hidden');
-                return;
+                return; 
             }
 
             if (user) {
-                state.currentUser = user;
+                state.currentUser = user; 
                 localStorage.setItem('loggedInUser', JSON.stringify(user));
                 document.getElementById('user-welcome-message').textContent = `Olá, ${user.name}!`;
-
+                
                 errorEl.classList.add('hidden');
                 document.getElementById('user-id').value = '';
                 document.getElementById('user-password').value = '';
-
-                // Reseta variáveis de controle de requisição ao logar
+                
                 state.selectedOrigin = null;
                 state.selectedDestinationsData = [];
                 selectedObservation = '';
@@ -528,7 +524,7 @@
                 scheduledDateTime = null;
                 isProcessingRequest = false;
 
-                await checkUserRideStatus();
+                await checkUserRideStatus(); 
                 showScreen('user-screen');
             } else {
                 errorEl.textContent = 'Matrícula ou senha incorreta!';
@@ -540,25 +536,24 @@
             state.currentUser = null;
             state.currentUserRideId = null;
             localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('currentUserRideId');
-            localStorage.removeItem('lastScreen');
+            localStorage.removeItem('currentUserRideId'); 
+            localStorage.removeItem('lastScreen'); 
             if (state.userStatusInterval) {
                 clearInterval(state.userStatusInterval);
                 state.userStatusInterval = null;
             }
-
+            
             document.getElementById('user-welcome-message').textContent = '';
             document.getElementById('user-request-form').classList.remove('hidden');
             document.getElementById('user-status').classList.add('hidden');
-
-            // Limpa os dados de locais selecionados
+            
             state.selectedOrigin = null;
             state.selectedDestinationsData = [];
 
             showScreen('initial-screen');
         }
 
-        // --- NAVEGAÇÃO ENTRE TELAS --- (sem alterações lógicas, apenas adiciona autocomplete)
+        // --- NAVEGAÇÃO ENTRE TELAS --- (sem alterações lógicas, apenas autocomplete)
         function updateUserScreenView() {
             const requestForm = document.getElementById('user-request-form');
             const permissionMessage = document.getElementById('permission-denied-message');
@@ -572,8 +567,6 @@
                 permissionMessage.classList.add('hidden');
                 if (!hasActiveRide) {
                     requestForm.classList.remove('hidden');
-                } else {
-                    requestForm.classList.add('hidden'); // Esconde o form se tiver corrida ativa
                 }
             }
         }
@@ -584,19 +577,17 @@
             if (activeScreen) {
                 activeScreen.classList.add('active');
             }
-
+            
             if (['initial-screen', 'user-login-screen', 'user-screen'].includes(screenId)) {
                 localStorage.setItem('lastScreen', screenId);
             }
 
             if (screenId === 'user-screen' && state.currentUser) {
-                updateUserScreenView();
+                updateUserScreenView(); 
                 await checkUserRideStatus();
-                // Inicializa o autocomplete nos campos de endereço da tela do usuário
-                initAutocomplete(document.getElementById('origin'), (feature) => {
-                    state.selectedOrigin = feature; // Guarda os dados do local selecionado
-                });
-                updateDestinationFields(document.getElementById('passenger-count').value); // Reinicializa autocompletes dos destinos
+                // Inicializa autocomplete aqui, APÓS a tela estar visível
+                initAutocomplete(document.getElementById('origin'), (feature) => { state.selectedOrigin = feature; });
+                updateDestinationFields(document.getElementById('passenger-count').value);
             } else if (state.userStatusInterval) {
                 clearInterval(state.userStatusInterval);
                 state.userStatusInterval = null;
@@ -606,7 +597,7 @@
                 toggleMenu();
             }
         }
-
+        
         // ========================================================================
         // FUNÇÃO ATUALIZADA - useCurrentLocation (Usa Geoapify Reverse Geocoding)
         // ========================================================================
@@ -664,7 +655,7 @@
             }
         }
 
-        // --- LÓGICA DE SOLICITAÇÃO DE CORRIDA --- (funções selectRequestType, openScheduleModal, confirmSchedule permanecem as mesmas)
+        // --- LÓGICA DE SOLICITAÇÃO DE CORRIDA --- (sem alterações)
         function selectRequestType(type) {
             selectedRequestType = type;
 
@@ -694,7 +685,7 @@
                 showModal('modal', 'Por favor, selecione uma data e hora para agendamento.');
                 return;
             }
-
+            
             const scheduledDate = new Date(`${dateInput.value}T${timeInput.value}`);
             if (scheduledDate < new Date()) {
                 showModal('modal', 'A data e hora do agendamento não podem ser no passado.');
@@ -702,7 +693,7 @@
             }
 
             scheduledDateTime = scheduledDate.toISOString();
-
+            
             closeModal('schedule-modal');
             requestRide();
         }
@@ -718,13 +709,13 @@
         // ========================================================================
         async function requestRide() {
             if (isProcessingRequest) return;
-            showScreen('user-screen'); // Garante que a tela correta esteja visível
+            showScreen('user-screen');
 
             const originInput = document.getElementById('origin');
             const originAddress = originInput.value.trim();
             const passengerCount = document.getElementById('passenger-count').value;
             const requestRideBtn = document.getElementById('request-ride-btn');
-
+            
             // 1. Validação usando os dados salvos no state pelo autocomplete
             if (!state.selectedOrigin || state.selectedOrigin.properties.formatted !== originAddress) {
                 showModal('modal', 'Endereço de ORIGEM inválido. Por favor, selecione um da lista de sugestões.');
@@ -737,8 +728,7 @@
             for (let i = 0; i < passengerCount; i++) {
                 const destInput = document.getElementById(`destination-${i + 1}`);
                 const destAddress = destInput ? destInput.value.trim() : '';
-                destinations.push(destAddress); // Guarda o endereço como string
-
+                
                 // Verifica se o endereço digitado corresponde a um local selecionado
                 const selectedData = state.selectedDestinationsData[i];
                 if (i === 0) { // Destino 1 é obrigatório e precisa ser validado
@@ -747,10 +737,13 @@
                         return;
                     }
                     firstDestinationValid = true;
+                    destinations.push(destAddress); // Guarda o endereço como string
                 } else if (destAddress && (!selectedData || selectedData.properties.formatted !== destAddress)) {
                     // Se digitou algo no destino 2+ mas não selecionou da lista
                      showModal('modal', `Endereço do DESTINO ${i+1} inválido. Por favor, selecione um da lista de sugestões ou deixe em branco se não aplicável.`);
                     return;
+                } else if (destAddress) {
+                    destinations.push(destAddress); // Guarda o endereço como string se válido
                 }
             }
 
@@ -759,7 +752,7 @@
                  return;
             }
 
-            const observation = document.getElementById('observation').value.trim();
+            const observation = selectedObservation; // Pega da variável global
 
             if (state.currentUserRideId) {
                 showModal('modal', 'Você já possui uma solicitação de corrida ativa.');
@@ -780,19 +773,12 @@
                     throw new Error('Usuário não encontrado. Por favor, faça login novamente.');
                 }
 
-                // Prepara os dados do destino para salvar no banco
-                // Salvaremos apenas os endereços formatados como strings
-                const destinationStrings = state.selectedDestinationsData
-                    .map(destData => destData ? destData.properties.formatted : '') // Pega o endereço formatado
-                    .filter(Boolean); // Remove vazios (se algum destino não foi preenchido)
-
                 let newRideData = {
                     origin_address: originAddress,
-                    // Salva os endereços formatados como um array de strings JSON
-                    destination: JSON.stringify(destinationStrings),
+                    destination: JSON.stringify(destinations), // Salva o array de strings de endereços
                     observation: observation,
                     passenger_count: parseInt(passengerCount),
-                    status: 'pending_approval', // Sempre começa como pendente
+                    status: 'pending_approval',
                     userId: currentUser.id,
                     userName: currentUser.name,
                     userCompany: currentUser.company,
@@ -803,7 +789,6 @@
 
                 if (selectedRequestType === 'scheduled' && scheduledDateTime) {
                     newRideData.scheduled_datetime = scheduledDateTime;
-                    // Mantém pending_approval mesmo se agendado
                 }
 
                 const { data, error } = await supabaseClient.from('rides').insert([newRideData]).select().single();
@@ -814,11 +799,10 @@
 
                 state.currentUserRideId = data.id;
                 localStorage.setItem('currentUserRideId', data.id);
-
-                // Limpa o formulário e os dados temporários
+                
                 document.getElementById('origin').value = '';
                 document.getElementById('passenger-count').value = 1;
-                updateDestinationFields(1); // Limpa e reseta os campos de destino
+                updateDestinationFields(1);
                 document.getElementById('observation').value = '';
                 state.selectedOrigin = null;
                 state.selectedDestinationsData = [];
@@ -826,52 +810,43 @@
                 selectedRequestType = '';
                 scheduledDateTime = null;
 
-                await checkUserRideStatus(); // Atualiza a tela para mostrar o status
+                await checkUserRideStatus(); 
 
             } catch (error) {
                 console.error("Erro detalhado no processo de solicitação:", error);
                 showModal('modal', error.message || 'Ocorreu um erro inesperado ao processar sua solicitação.');
-                // Não reseta o botão aqui, deixa o usuário ver o erro
             } finally {
-                // Reseta o botão apenas se a requisição não estiver mais processando
-                // (pode ter falhado ou sucedido)
                 isProcessingRequest = false;
                 resetRequestButton();
             }
         }
-
-
-        // --- Funções checkUserRideStatus, startUserStatusCheck, updateUserStatusMessage, cancelRide ---
-        // Nenhuma alteração necessária aqui, elas já lidam com os dados do Supabase.
-
+        
+        // --- checkUserRideStatus, startUserStatusCheck, updateUserStatusMessage, cancelRide ---
+        // Nenhuma alteração necessária aqui
         async function checkUserRideStatus() {
             if (!state.currentUser) return;
 
             const requestForm = document.getElementById('user-request-form');
             const userStatusDiv = document.getElementById('user-status');
             const chegueiImage = document.getElementById('cheguei-image');
-
-            // Tenta pegar o ID da corrida do localStorage primeiro
+            
             const storedRideId = localStorage.getItem('currentUserRideId');
             let rideToCheckId = state.currentUserRideId || storedRideId;
 
             let activeRide = null;
             let error = null;
 
-            // Se temos um ID, verificamos se essa corrida específica ainda está ativa
             if (rideToCheckId) {
                 const { data, error: fetchError } = await supabaseClient
                     .from('rides')
                     .select('*')
                     .eq('id', rideToCheckId)
                     .in('status', ['pending_approval', 'approved', 'rejected', 'requested', 'assigned', 'accepted', 'arrived_pickup', 'in_progress', 'scheduled'])
-                    .maybeSingle(); // Use maybeSingle para não dar erro se não encontrar
+                    .maybeSingle();
                  activeRide = data;
                  error = fetchError;
             }
 
-            // Se não encontrou uma corrida ativa pelo ID armazenado, ou se não havia ID,
-            // faz uma busca mais geral por qualquer corrida ativa do usuário
             if (!activeRide && !error) {
                  const { data, error: fetchError } = await supabaseClient
                     .from('rides')
@@ -888,25 +863,24 @@
 
             if (error) {
                  console.error("Erro ao buscar corrida ativa:", error);
-                 // Continua para o estado sem corrida ativa
             }
 
 
             if (activeRide && activeRide.status !== 'rejected') {
                 state.currentUserRideId = activeRide.id;
-                localStorage.setItem('currentUserRideId', activeRide.id); // Atualiza o ID correto
+                localStorage.setItem('currentUserRideId', activeRide.id);
 
                 requestForm.classList.add('hidden');
                 userStatusDiv.classList.remove('hidden');
                 await updateUserStatusMessage(activeRide);
-
+                
                 if (activeRide.status === 'arrived_pickup') {
                     chegueiImage.classList.remove('hidden');
                 } else {
                     chegueiImage.classList.add('hidden');
                 }
 
-                startUserStatusCheck();
+                startUserStatusCheck(); 
             } else {
                 if(activeRide && activeRide.status === 'rejected'){
                     const seenRejectedId = localStorage.getItem('seenRejectedRideId');
@@ -918,46 +892,47 @@
                 }
                 state.currentUserRideId = null;
                 localStorage.removeItem('currentUserRideId');
-
+                
                 userStatusDiv.classList.add('hidden');
-                updateUserScreenView(); // Mostra o formulário se permitido
+                updateUserScreenView();
                 resetRequestButton();
                 document.getElementById('user-status-message').textContent = '';
                 chegueiImage.classList.add('hidden');
-
-                if (state.userStatusInterval) {
+                
+                if (state.userStatusInterval) { 
                     clearInterval(state.userStatusInterval);
                     state.userStatusInterval = null;
                 }
             }
         }
 
+
         function startUserStatusCheck() {
             if (state.userStatusInterval) clearInterval(state.userStatusInterval);
-
+            
             state.userStatusInterval = setInterval(async () => {
                 if (!state.currentUserRideId) {
-                    clearInterval(state.userStatusInterval);
+                    clearInterval(state.userStatusInterval); 
                     state.userStatusInterval = null;
-                    await checkUserRideStatus();
+                    await checkUserRideStatus(); 
                     return;
                 }
-
+                
                 const { data: myRide, error } = await supabaseClient.from('rides').select('*').eq('id', state.currentUserRideId).single();
-
+                
                 if (myRide && !['completed', 'canceled', 'rejected'].includes(myRide.status)) {
-                   await updateUserStatusMessage(myRide);
+                   await updateUserStatusMessage(myRide); 
                 } else {
                     clearInterval(state.userStatusInterval);
                     state.userStatusInterval = null;
                     const finalStatus = myRide ? translateStatus(myRide.status) : 'finalizada';
-                    state.currentUserRideId = null;
-                    localStorage.removeItem('currentUserRideId');
+                    state.currentUserRideId = null; 
+                    localStorage.removeItem('currentUserRideId'); 
                     showModal('modal', `Sua corrida foi ${finalStatus}.`, checkUserRideStatus);
                 }
-            }, 10000);
+            }, 10000); 
         }
-
+        
         function silenceAlert() {
             const arrivalSound = document.getElementById('arrival-sound');
             const silenceBtn = document.getElementById('silence-alert-btn');
@@ -989,50 +964,48 @@
 
             let message = '';
             let scheduleInfo = '';
-            let driverInfo = '';
+            let driverInfo = ''; 
 
-            // Busca detalhes do motorista APENAS se necessário e ainda não carregados
             if (ride.driverId && ['assigned', 'accepted', 'arrived_pickup', 'in_progress'].includes(ride.status)) {
-                // Você pode adicionar um cache simples aqui se quiser evitar buscas repetidas
-                try {
-                    const { data: driver, error: driverError } = await supabaseClient
-                        .from('drivers') // Assumindo que a tabela é 'drivers'
-                        .select('name, plate, car_model, car_color') // Pegue os campos relevantes
-                        .eq('id', ride.driverId)
-                        .single();
+                const { data: driver, error } = await supabaseClient
+                    .from('drivers')
+                    .select('name, plate, car_model, car_color')
+                    .eq('id', ride.driverId)
+                    .single();
 
-                    if (driverError) throw driverError;
+                if (error) {
+                    console.error('Error fetching driver details:', error);
+                }
 
-                    if (driver) {
-                        driverInfo = `
-                            <div class="mt-4 p-3 bg-gray-800 rounded-lg text-left border border-gray-600">
-                                <p class="font-semibold text-center text-lg mb-3 text-cyan-400">Motorista a caminho</p>
-                                <p class="text-center text-xl font-bold mb-3">${ride.driverName || driver.name || 'N/A'}</p>
-                                <div class="flex justify-between items-center">
-                                    <div class="space-y-1 text-center flex-1">
-                                        <p class="text-lg"><strong>Modelo:</strong> ${driver.car_model || 'N/A'}</p>
-                                    </div>
-                                    <div class="border-2 border-gray-400 rounded-lg py-1 px-3 flex flex-col items-center justify-center">
-                                        <span class="text-base font-semibold">${(driver.car_color || 'N/A').toUpperCase()}</span>
-                                        <div class="flex items-baseline space-x-2">
-                                            <span class="text-base font-bold">PLACA</span>
-                                            <span class="text-2xl font-bold tracking-wider">${driver.plate || 'N/A'}</span>
-                                        </div>
+                if (driver) {
+                     driverInfo = `
+                        <div class="mt-4 p-3 bg-gray-800 rounded-lg text-left border border-gray-600">
+                            <p class="font-semibold text-center text-lg mb-3 text-cyan-400">Motorista a caminho</p>
+                            <p class="text-center text-xl font-bold mb-3">${ride.driverName || driver.name || 'N/A'}</p>
+                            <div class="flex justify-between items-center">
+                                <div class="space-y-1 text-center flex-1">
+                                    <p class="text-lg"><strong>Modelo:</strong> ${driver.car_model || 'N/A'}</p>
+                                </div>
+                                <div class="border-2 border-gray-400 rounded-lg py-1 px-3 flex flex-col items-center justify-center">
+                                    <span class="text-base font-semibold">${(driver.car_color || 'N/A').toUpperCase()}</span>
+                                    <div class="flex items-baseline space-x-2">
+                                        <span class="text-base font-bold">PLACA</span>
+                                        <span class="text-2xl font-bold tracking-wider">${driver.plate || 'N/A'}</span>
                                     </div>
                                 </div>
                             </div>
-                        `;
-                    }
-                } catch (error) {
-                    console.error('Erro ao buscar detalhes do motorista:', error);
-                    // Exibe apenas o nome se a busca falhar mas o nome existir na corrida
-                    if (ride.driverName) {
-                       driverInfo = `<div class="mt-4 p-3 bg-gray-800 rounded-lg text-sm border border-gray-600"><p class="font-semibold text-center text-lg mb-2 text-cyan-400">Motorista a caminho</p><p class="text-center text-xl font-bold">${ride.driverName}</p></div>`;
-                    }
+                        </div>
+                    `;
+                } else if (ride.driverName) {
+                    driverInfo = `
+                        <div class="mt-4 p-3 bg-gray-800 rounded-lg text-left text-sm border border-gray-600">
+                           <p class="font-semibold text-center text-lg mb-2 text-cyan-400">Motorista a caminho</p>
+                           <p class="text-center text-xl font-bold">${ride.driverName}</p>
+                        </div>
+                    `;
                 }
             }
-
-
+            
             if (ride.request_type === 'scheduled' && ride.scheduled_datetime) {
                 const scheduledDate = new Date(ride.scheduled_datetime);
                 const formattedScheduledDateTime = scheduledDate.toLocaleString('pt-BR', {
@@ -1048,7 +1021,7 @@
                     message = 'Aguardando aprovação da sua empresa...';
                     getIcon('searching').classList.remove('hidden');
                     break;
-                case 'approved': // Adicionado status aprovado
+                case 'approved':
                 case 'requested':
                     message = 'Procurando o melhor motorista para você...';
                     getIcon('searching').classList.remove('hidden');
@@ -1066,43 +1039,40 @@
                     message = `Seu motorista chegou!`;
                     chegueiImage.classList.remove('hidden');
                     if (arrivalSound) {
-                        // Tenta tocar o som
-                        arrivalSound.play().catch(e => console.warn("A reprodução automática de áudio pode ter sido bloqueada.", e));
+                        arrivalSound.play().catch(e => console.warn("A reprodução automática de áudio foi bloqueada pelo navegador.", e));
                     }
                     silenceBtn.classList.remove('hidden');
                     break;
                 case 'in_progress':
-                    chegueiImage.classList.add('hidden'); // Esconde a imagem se estava visível
+                    chegueiImage.classList.add('hidden');
                     message = `Viagem em andamento. Boa viagem!`;
                     getIcon('in-progress').innerHTML = `<img src="images/destino.png" alt="Viagem Iniciada" class="h-20 w-20 mx-auto animate-bounce">`;
                     getIcon('in-progress').classList.remove('hidden');
                     break;
-                 case 'scheduled': // Adicionado status agendado
+                 case 'scheduled':
                     message = `Sua corrida está agendada.`;
-                    getIcon('searching').classList.remove('hidden'); // Usa ícone de busca para agendado
+                    getIcon('searching').classList.remove('hidden');
                     break;
                 default:
                     message = `Status: ${translateStatus(ride.status)}`;
-                    // Pode adicionar um ícone padrão aqui se quiser
                     break;
             }
 
-            statusMessageEl.innerHTML = message + scheduleInfo + driverInfo;
-
-            // Lógica para mostrar/esconder botões
+            statusMessageEl.innerHTML = message + scheduleInfo + driverInfo; 
+            
             if (ride.request_type === 'scheduled' && ['pending_approval', 'approved', 'scheduled', 'assigned', 'accepted'].includes(ride.status)) {
                 editScheduleBtn.classList.remove('hidden');
             } else {
                 editScheduleBtn.classList.add('hidden');
             }
 
-            // Permite cancelar se estiver pendente, aprovado, solicitado, agendado, designado ou aceito
             if (['pending_approval', 'approved', 'requested', 'scheduled', 'assigned', 'accepted'].includes(ride.status)) {
                 cancelRideBtn.classList.remove('hidden');
             } else {
                 cancelRideBtn.classList.add('hidden');
             }
         }
+
 
         async function cancelRide() {
             if (state.currentUserRideId) {
@@ -1112,75 +1082,63 @@
                         showModal('modal', 'Não foi possível cancelar a corrida.');
                         console.error('Erro ao cancelar corrida:', error);
                     } else {
-                        // Não mostra modal de sucesso, apenas atualiza o status que removerá a corrida ativa
-                        await checkUserRideStatus();
+                        showModal('modal', 'Sua corrida foi cancelada.', checkUserRideStatus);
                     }
-                }, true);
+                }, true); 
             }
         }
 
-
-        // --- Funções fetchAllData, setupRealtimeSubscriptions --- (sem alterações)
         async function fetchAllData() {
             const { data: users, error: usersError } = await supabaseClient.from('users').select('*');
             if (usersError) console.error('Error fetching users:', usersError); else state.users = users;
-
+            
             const { data: rides, error: ridesError } = await supabaseClient.from('rides').select('*');
             if (ridesError) console.error('Error fetching rides:', ridesError); else state.rides = rides;
         }
 
         function setupRealtimeSubscriptions() {
             supabaseClient.channel('public:rides').on(
-                'postgres_changes',
-                { event: '*', schema: 'public', table: 'rides' },
-                async (payload) => { // Marca a função como async
-                    // Atualiza os dados locais primeiro para ter a informação mais recente
-                    await fetchAllData();
-
+                'postgres_changes', 
+                { event: '*', schema: 'public', table: 'rides' }, 
+                payload => {
                     // Verifica se a mudança é relevante para o usuário atual
                     const relevantRide = payload.new?.userId === state.currentUser?.id || payload.old?.userId === state.currentUser?.id;
-
+                    
                     if (state.currentUser && relevantRide) {
-                       await checkUserRideStatus(); // Usa await para garantir que a verificação termine
+                       // Atualiza os dados locais ANTES de checar o status
+                       fetchAllData().then(() => {
+                            checkUserRideStatus();
+                       });
                     }
                 }
-            ).subscribe((status, err) => {
-                 if (status === 'SUBSCRIBED') { console.log('Conectado ao canal de corridas!'); }
-                 if (err) { console.error('Erro na assinatura do canal de corridas:', err); }
-            });
+            ).subscribe();
         }
 
-        // --- FUNÇÃO DE INICIALIZAÇÃO PRINCIPAL --- (sem alterações lógicas, apenas garante ordem)
         async function initApp() {
-            loadAppIcon();
-
-            await fetchAllData(); // Carrega dados antes de decidir a tela
-
-            // Inicializa autocomplete nos campos (será re-inicializado ao mostrar a tela do usuário se necessário)
-            initAutocomplete(document.getElementById('origin'), (feature) => { state.selectedOrigin = feature; });
-            updateDestinationFields(1); // Inicializa campos de destino
-
+            loadAppIcon();      
+            
+            await fetchAllData();
+            
+            const passengerSelect = document.getElementById('passenger-count');
+            if (passengerSelect) {
+                passengerSelect.addEventListener('change', (e) => updateDestinationFields(e.target.value));
+            }
+            
             const loggedInUserJSON = localStorage.getItem('loggedInUser');
             if (loggedInUserJSON) {
-                try {
-                    state.currentUser = JSON.parse(loggedInUserJSON);
-                    if (state.currentUser && state.currentUser.id) {
-                         document.getElementById('user-welcome-message').textContent = `Olá, ${state.currentUser.name}!`;
-                         setupRealtimeSubscriptions(); // Configura subscriptions ANTES de mostrar a tela
-                         await showScreen('user-screen'); // Mostra a tela e verifica status da corrida
-                    } else {
-                        throw new Error("Dados de usuário inválidos no localStorage");
-                    }
-                } catch (e) {
-                     console.error("Erro ao processar usuário logado:", e);
-                     logoutUser(); // Desloga se houver erro
+                state.currentUser = JSON.parse(loggedInUserJSON);
+                if (state.currentUser) {
+                    document.getElementById('user-welcome-message').textContent = `Olá, ${state.currentUser.name}!`;
+                    setupRealtimeSubscriptions();
+                    await showScreen('user-screen'); // Isso vai chamar o initAutocomplete
+                } else {
+                    logoutUser();
                 }
             } else {
                 showScreen(localStorage.getItem('lastScreen') || 'initial-screen');
             }
         }
-
-        // --- Função handleVideoEnd --- (sem alterações)
+        
         function handleVideoEnd() {
             if (document.body.dataset.videoEnded) return;
             document.body.dataset.videoEnded = "true";
@@ -1190,68 +1148,71 @@
 
             if (videoContainer) videoContainer.style.display = 'none';
             if (appContainer) appContainer.classList.remove('hidden');
-
-            initApp(); // Chama initApp APÓS o vídeo terminar
+            
+            initApp(); // Chama o initApp após o vídeo
         }
 
         const video = document.getElementById('intro-video');
         if (video) {
             video.addEventListener('ended', handleVideoEnd);
             video.addEventListener('error', handleVideoEnd);
-            setTimeout(handleVideoEnd, 10000); // Timeout de segurança
+            // Timeout de segurança caso o vídeo falhe
+            setTimeout(handleVideoEnd, 10000);
         } else {
             // Se não houver vídeo, inicia imediatamente
-            const appContainer = document.getElementById('app-container');
-            if (appContainer) appContainer.classList.remove('hidden');
-            initApp();
+            handleVideoEnd();
         }
 
         // ========================================================================
         // FUNÇÃO ATUALIZADA - initAutocomplete (Usa Geoapify)
         // ========================================================================
         function initAutocomplete(inputElement, onPlaceSelectCallback) {
-            if (!inputElement || typeof Autocomplete === 'undefined') return;
-
-            // Remove instância anterior para evitar duplicatas
+            // Verifica se a biblioteca foi carregada
+            if (typeof Autocomplete === 'undefined') {
+                console.error("ERRO: Biblioteca Autocomplete (Geoapify) não carregada.");
+                return;
+            }
+            
+            // Evita reinicializar
             if (inputElement.geoapify_autocomplete_instance) {
-                inputElement.geoapify_autocomplete_instance.destroy();
-                inputElement.geoapify_autocomplete_instance = null;
+                 inputElement.geoapify_autocomplete_instance.destroy();
+                 inputElement.geoapify_autocomplete_instance = null;
             }
 
-            const autocomplete = new Autocomplete(inputElement, {
-                apiKey: GEOAPIFY_API_KEY,
-                filter: { countrycode: ['br'] },
-                lang: 'pt',
-                placeholder: inputElement.placeholder,
-                allowNonVerifiedHouseNumber: true,
-                allowNonVerifiedStreet: true
-            });
+            try {
+                const autocomplete = new Autocomplete(inputElement, {
+                    apiKey: GEOAPIFY_API_KEY,
+                    filter: { countrycode: ['br'] },
+                    lang: 'pt',
+                    placeholder: inputElement.placeholder,
+                    allowNonVerifiedHouseNumber: true,
+                    allowNonVerifiedStreet: true
+                });
 
-            autocomplete.on('select', (feature) => {
-                if (feature && onPlaceSelectCallback) {
-                    onPlaceSelectCallback(feature); // Chama o callback com os dados do local
-                } else if (!feature && onPlaceSelectCallback) {
-                    // Se o usuário apagar o campo ou não selecionar, limpa os dados
-                    onPlaceSelectCallback(null);
-                }
-            });
+                autocomplete.on('select', (feature) => {
+                    if (feature && onPlaceSelectCallback) {
+                        onPlaceSelectCallback(feature); // Chama o callback com os dados do local
+                    }
+                });
 
-            // Guarda a instância no elemento para poder destruir depois se necessário
-            inputElement.geoapify_autocomplete_instance = autocomplete;
+                inputElement.geoapify_autocomplete_instance = autocomplete;
+
+            } catch (error) {
+                console.error("Erro ao inicializar Geoapify Autocomplete:", error, "no elemento:", inputElement);
+            }
         }
-
-
+        
         // ========================================================================
-        // FUNÇÃO ATUALIZADA - updateDestinationFields (Inicializa Autocomplete)
+        // FUNÇÃO ATUALIZADA - updateDestinationFields (Usa Geoapify)
         // ========================================================================
         function updateDestinationFields(passengerCount) {
             const container = document.getElementById('destinations-container');
-            container.innerHTML = '';
-            state.selectedDestinationsData = new Array(parseInt(passengerCount)).fill(null); // Reseta/Cria array para guardar dados
+            container.innerHTML = ''; // Limpa campos antigos
+            state.selectedDestinationsData = new Array(parseInt(passengerCount)).fill(null); // Reseta/Cria array
 
             for (let i = 1; i <= passengerCount; i++) {
                 const inputContainer = document.createElement('div');
-                inputContainer.className = 'mb-4 input-and-button-container autocomplete-container'; // Adiciona classe container
+                inputContainer.className = 'mb-4 input-and-button-container autocomplete-container'; // Adiciona container
 
                 const label = document.createElement('label');
                 label.htmlFor = `destination-${i}`;
@@ -1264,28 +1225,36 @@
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.id = `destination-${i}`;
-                input.className = 'w-full p-3 rounded-lg bg-gray-800 border border-gray-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none'; // Estilo normal
+                input.className = 'w-full p-3 rounded-lg bg-gray-800 border border-gray-600 focus:ring-2 focus:ring-yellow-300 focus:outline-none';
                 input.placeholder = 'Digite o endereço completo';
-
+                
                 inputContainer.appendChild(label);
                 inputContainer.appendChild(input);
                 container.appendChild(inputContainer);
 
-                // Inicializa o autocomplete para este campo de destino
-                // Usa um índice (i-1) para salvar os dados no array state.selectedDestinationsData
+                // Inicializa o autocomplete para este novo campo
+                // Usa um índice (i-1) para salvar os dados no array
                 initAutocomplete(input, (feature) => {
                     state.selectedDestinationsData[i - 1] = feature;
                 });
             }
         }
 
-
-        // --- Funções translateStatus, loadAppIcon, renderUserRideHistory, showHistoryModal, openEditScheduleModal, confirmScheduleEdit, exportUserRidesToExcel ---
+        // --- Funções restantes (translateStatus, loadAppIcon, etc.) ---
         // Nenhuma alteração necessária aqui.
-
         function translateStatus(status) {
             const translations = {
-                'pending_approval': 'AGUARDANDO APROVAÇÃO', 'approved': 'APROVADA', 'rejected': 'REJEITADA', 'requested': 'SOLICITADO', 'assigned': 'DESIGNADO', 'accepted': 'ACEITO', 'arrived_pickup': 'NO LOCAL', 'in_progress': 'EM ANDAMENTO', 'scheduled': 'AGENDADO', 'completed': 'FINALIZADA', 'canceled': 'CANCELADA',
+                'pending_approval': 'AGUARDANDO APROVAÇÃO',
+                'approved': 'APROVADA',
+                'rejected': 'REJEITADA',
+                'requested': 'SOLICITADO', 
+                'assigned': 'DESIGNADO', 
+                'accepted': 'ACEITO',
+                'arrived_pickup': 'NO LOCAL', 
+                'in_progress': 'EM ANDAMENTO',
+                'scheduled': 'AGENDADO',
+                'completed': 'FINALIZADA', 
+                'canceled': 'CANCELADA',
             };
             return translations[status] || status.toUpperCase();
         }
@@ -1294,32 +1263,32 @@
             const iconContainer = document.getElementById('app-icon-container');
             iconContainer.innerHTML = `<img src="${state.appIcon}" class="h-full w-full object-contain">`;
         }
-
+        
         async function renderUserRideHistory() {
-            await fetchAllData();
+            await fetchAllData(); 
             const historyContainer = document.getElementById("user-ride-history-modal");
             if (!historyContainer || !state.currentUser) return;
 
-            historyContainer.innerHTML = '';
+            historyContainer.innerHTML = ''; 
             const userRides = state.rides.filter(r => r.userId === state.currentUser.id).sort((a, b) => new Date(b.requestTime) - new Date(a.requestTime));
-
+            
             if (userRides.length === 0) {
                 historyContainer.innerHTML = '<p class="text-center text-gray-400">Nenhum histórico de corrida.</p>';
                 return;
             }
-
+            
             const table = document.createElement('table');
             table.className = 'w-full text-sm text-left';
             table.innerHTML = `
                 <thead class="text-xs text-gray-300 uppercase bg-gray-900/30">
                     <tr>
-                        <th scope="col" class="px-4 py-3">Data e Hora</th>
+                        <th scope="col" class="px-4 py-3">Data e Hora</th> 
                         <th scope="col" class="px-4 py-3">Destino</th>
                         <th scope="col" class="px-4 py-3">Status</th>
                     </tr>
                 </thead>`;
             const tbody = document.createElement('tbody');
-
+            
             userRides.forEach(ride => {
                 const row = document.createElement('tr');
                 row.className = 'border-b border-gray-700';
@@ -1328,23 +1297,22 @@
                 let historyDestination = ride.destination;
                 try {
                     // Tenta interpretar o destino como JSON (array de strings)
-                    const destinationsArray = JSON.parse(ride.destination);
-                    if (Array.isArray(destinationsArray) && destinationsArray.length > 0) {
-                        historyDestination = destinationsArray.join('; '); // Junta múltiplos destinos
+                    const destinations = JSON.parse(ride.destination);
+                    if (Array.isArray(destinations) && destinations.length > 0) {
+                        historyDestination = destinations.join('; '); // Junta múltiplos destinos
                     }
                 } catch (e) { /* Mantém o destino como string se não for JSON válido */ }
-
+                
                 row.innerHTML = `
-                    <td class="px-4 py-3">${dateTimeString}</td>
+                    <td class="px-4 py-3">${dateTimeString}</td> 
                     <td class="px-4 py-3">${historyDestination}</td>
                     <td class="px-4 py-3">${translateStatus(ride.status)}</td>
                 `;
                 tbody.appendChild(row);
             });
-            table.appendChild(tbody);
-            historyContainer.appendChild(table);
+            table.appendChild(tbody); 
+            historyContainer.appendChild(table); 
         }
-
 
         function showHistoryModal() {
             renderUserRideHistory().then(() => {
@@ -1355,16 +1323,16 @@
                 }
             });
         }
-
+        
         async function openEditScheduleModal(rideId) {
             const currentRideId = rideId || state.currentUserRideId;
             if (!currentRideId) {
                  showModal('modal', 'Não foi possível identificar a corrida para edição.');
                  return;
             }
-
+            
             await fetchAllData();
-
+            
             const rideToEdit = state.rides.find(r => r.id === currentRideId);
             if (!rideToEdit) {
                 showModal('modal', 'Corrida não encontrada para edição.');
@@ -1376,7 +1344,7 @@
             const timeInput = document.getElementById('schedule-time');
             const confirmBtn = modal.querySelector('button.button-gradient');
 
-            // Verifica se a data agendada existe e é válida
+             // Verifica se a data agendada existe e é válida
              let existingDate;
              try {
                 if (rideToEdit.scheduled_datetime) {
@@ -1432,13 +1400,13 @@
                 checkUserRideStatus();
             }
         }
-
+        
         function exportUserRidesToExcel() {
             if (!state.currentUser) return; // Adiciona verificação
             const userRides = state.rides.filter(r => r.userId === state.currentUser.id);
-            if (userRides.length === 0) {
-                showModal("modal", "Nenhum histórico de corrida para exportar.");
-                return;
+            if (userRides.length === 0) { 
+                showModal("modal", "Nenhum histórico de corrida para exportar."); 
+                return; 
             }
 
             const dataToExport = userRides.map(ride => {
@@ -1463,61 +1431,52 @@
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Minhas Corridas");
-
+            
             XLSX.writeFile(workbook, "meu_historico_corridas.xlsx");
         }
 
-
-        // --- BOTÃO DE SOLICITAR --- (Função de clique movida para cá para garantir ordem)
+        // ========================================================================
+        // FUNÇÃO ATUALIZADA - Botão de Solicitar (Usa state e validação)
+        // ========================================================================
         document.getElementById('request-ride-btn').onclick = function() {
-            // A lógica aqui agora é apenas coletar os dados e ir para a tela de tipo
-            const originAddress = document.getElementById('origin').value.trim();
             const passengerCount = document.getElementById('passenger-count').value;
+            const originAddress = document.getElementById('origin').value.trim();
 
             // Valida origem
             if (!state.selectedOrigin || state.selectedOrigin.properties.formatted !== originAddress) {
-                showModal('modal', 'Endereço de ORIGEM inválido. Por favor, selecione um da lista de sugestões.');
+                showModal('modal', 'Endereço de ORIGEM inválido. Por favor, selecione um da lista de sugestões ou use sua localização atual.');
                 return;
             }
 
-            // Valida pelo menos o primeiro destino
+            // Valida destinos
             let firstDestinationValid = false;
-            const destInput1 = document.getElementById(`destination-1`);
-            const destAddress1 = destInput1 ? destInput1.value.trim() : '';
-            const selectedData1 = state.selectedDestinationsData[0];
-            if (destAddress1 && selectedData1 && selectedData1.properties.formatted === destAddress1) {
-                 firstDestinationValid = true;
-            }
-
-            if (!firstDestinationValid) {
-                showModal('modal', 'O destino do primeiro passageiro é obrigatório e precisa ser selecionado da lista.');
-                return;
-            }
-
-            // Valida destinos adicionais (se preenchidos)
-             for (let i = 1; i < passengerCount; i++) {
+             for (let i = 0; i < passengerCount; i++) {
                  const destInput = document.getElementById(`destination-${i + 1}`);
                  const destAddress = destInput ? destInput.value.trim() : '';
                  const selectedData = state.selectedDestinationsData[i];
-                 if (destAddress && (!selectedData || selectedData.properties.formatted !== destAddress)) {
+
+                 if (i === 0) { // Destino 1 é obrigatório
+                     if (!destAddress || !selectedData || selectedData.properties.formatted !== destAddress) {
+                        showModal('modal', 'O destino do primeiro passageiro é obrigatório e precisa ser selecionado da lista.');
+                        return;
+                     }
+                     firstDestinationValid = true;
+                 } else if (destAddress && (!selectedData || selectedData.properties.formatted !== destAddress)) {
+                     // Se digitou algo no destino 2+ mas não selecionou da lista
                       showModal('modal', `Endereço do DESTINO ${i+1} inválido. Por favor, selecione um da lista de sugestões ou deixe em branco.`);
                      return;
                  }
              }
-
-            // Guarda a observação
+            
             selectedObservation = document.getElementById('observation').value.trim();
-
-            // Mostra a tela para escolher Imediato ou Agendado
-            showScreen('request-type-screen');
+            
+            showScreen('request-type-screen'); 
         };
 
-        // Adiciona listener para quantidade de passageiros para atualizar os campos de destino
-        const passengerSelect = document.getElementById('passenger-count');
-        if (passengerSelect) {
-             passengerSelect.addEventListener('change', (e) => updateDestinationFields(e.target.value));
-        }
+        // Adiciona listener para o select de passageiros
+        document.getElementById('passenger-count').addEventListener('change', (e) => updateDestinationFields(e.target.value));
 
     </script>
+    
     </body>
 </html>
