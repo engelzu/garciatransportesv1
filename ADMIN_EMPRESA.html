@@ -299,9 +299,9 @@
                 try {
                     const parsed = JSON.parse(str);
                     if (Array.isArray(parsed)) {
-                        // Se for array de objetos {name, address}, extrai 'address'
+                        // Se for array de objetos {name, address}, retorna direto
                         if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null && 'address' in parsed[0]) {
-                           return parsed; // Retorna o array de objetos completo
+                           return parsed.filter(d => d.address); // Retorna objetos válidos
                         }
                         // Senão, trata como array de strings e converte para o formato {name, address}
                          return parsed.map((addr, index) => ({
@@ -467,6 +467,9 @@
              document.getElementById('request-ride-screen').classList.add('active');
         }
 
+        // ========================================================================
+        // FUNÇÃO CORRIGIDA - handlePassengerQuantityChange (Usa requestAnimationFrame)
+        // ========================================================================
         function handlePassengerQuantityChange(event) {
             const quantity = parseInt(event.target.value, 10);
             const container = document.getElementById('collaborators-container');
@@ -487,9 +490,10 @@
 
             const optionsHtml = companyUsers.map(user => `<option value="${user.id}">${user.name}</option>`).join('');
 
-            // Cria inputs para cada passageiro (origem)
+            // Cria HTML para os inputs
+            let inputsHtml = '';
             for (let i = 0; i < quantity; i++) {
-                container.innerHTML += `
+                inputsHtml += `
                     <div class="border border-gray-700 p-3 rounded-lg">
                         <p class="font-semibold text-md mb-2">Origem (Passageiro ${i + 1})</p>
                         <div class="mb-2">
@@ -499,32 +503,55 @@
                                 ${optionsHtml}
                             </select>
                         </div>
-                        <div class="autocomplete-container"> <label for="address-input-${i}" class="block mb-1 text-xs font-medium">Endereço</label>
+                        <div class="autocomplete-container">
+                            <label for="address-input-${i}" class="block mb-1 text-xs font-medium">Endereço</label>
                             <input type="text" id="address-input-${i}" class="w-full p-2 rounded-lg" placeholder="Endereço autocompletado ou manual">
                         </div>
                     </div>
                 `;
             }
 
-            // Cria input para o destino final
-            container.innerHTML += `
-                <div class="border border-cyan-400 p-3 rounded-lg mt-4"> <p class="font-semibold text-md mb-2 text-cyan-400">Destino Final</p>
-                    <div class="autocomplete-container"> <label for="address-input-destination" class="block mb-1 text-xs font-medium">Endereço de Destino</label>
+            inputsHtml += `
+                <div class="border border-cyan-400 p-3 rounded-lg mt-4">
+                    <p class="font-semibold text-md mb-2 text-cyan-400">Destino Final</p>
+                    <div class="autocomplete-container">
+                        <label for="address-input-destination" class="block mb-1 text-xs font-medium">Endereço de Destino</label>
                         <input type="text" id="address-input-destination" class="w-full p-2 rounded-lg" placeholder="Digite o endereço de destino da viagem">
                     </div>
                 </div>
             `;
 
-            // Adiciona listener para autocompletar endereço ao selecionar colaborador
-            document.querySelectorAll('.collaborator-selector').forEach(select => {
-                select.addEventListener('change', handleCollaboratorSelection);
-            });
+            // Adiciona o HTML ao container de uma vez
+            container.innerHTML = inputsHtml;
 
-            // Inicializa autocomplete para todos os inputs de endereço criados
-            for (let i = 0; i < quantity; i++) {
-                initAutocomplete(document.getElementById(`address-input-${i}`));
-            }
-            initAutocomplete(document.getElementById(`address-input-destination`));
+            // ---- MODIFICAÇÃO PRINCIPAL AQUI ----
+            // Usa requestAnimationFrame para inicializar o autocomplete após o DOM atualizar
+            requestAnimationFrame(() => {
+                console.log("Inicializando autocompletes após renderização..."); // Log de depuração
+                // Inicializa autocomplete para todos os inputs de endereço criados
+                for (let i = 0; i < quantity; i++) {
+                    const inputElement = document.getElementById(`address-input-${i}`);
+                    if (inputElement) {
+                         initAutocomplete(inputElement);
+                    } else {
+                         console.error(`Elemento address-input-${i} não encontrado após renderização.`);
+                    }
+                }
+                const destInputElement = document.getElementById('address-input-destination');
+                 if (destInputElement) {
+                     initAutocomplete(destInputElement);
+                 } else {
+                     console.error("Elemento address-input-destination não encontrado após renderização.");
+                 }
+
+                 // Adiciona listener para autocompletar endereço ao selecionar colaborador DEPOIS que os selects existem
+                 document.querySelectorAll('.collaborator-selector').forEach(select => {
+                    // Remove listener antigo para evitar duplicatas
+                    select.removeEventListener('change', handleCollaboratorSelection);
+                    select.addEventListener('change', handleCollaboratorSelection);
+                 });
+            });
+             // ---- FIM DA MODIFICAÇÃO ----
         }
 
 
@@ -981,7 +1008,8 @@
 
                     if (rideCompany === companyName) {
                         // Atualiza os dados locais ANTES de recarregar a UI
-                        await refreshAllUsers(); // Garante que a lista de usuários esteja atualizada
+                        // await refreshAllUsers(); // ATENÇÃO: Não precisa buscar TODOS os usuários aqui, apenas as rides. buscar rides é mais eficiente
+                         // A função chamada abaixo (loadPending/History) já busca as rides necessárias
 
                         const activeSubScreen = activeScreen.querySelector('.admin-sub-screen.active');
                         if (activeSubScreen) {
@@ -990,10 +1018,11 @@
                             } else if (activeSubScreen.id === 'history-screen') {
                                 await loadHistoryRides(); // Usa await
                             }
-                             // Se estiver na tela de solicitar, força a recriação dos selects
+                             // Se estiver na tela de solicitar, força a recriação dos selects (mantém)
                              else if (activeSubScreen.id === 'request-ride-screen') {
                                 const passengerSelect = document.getElementById('passenger-quantity-select');
                                 if (passengerSelect.value) {
+                                    await refreshAllUsers(); // Precisa atualizar a lista de usuários para recriar os selects
                                     handlePassengerQuantityChange({ target: passengerSelect });
                                 }
                              }
@@ -1123,9 +1152,9 @@
             } else {
                 alert(`Empresa "${data[0].name}" ${id ? 'atualizada' : 'adicionada'} com sucesso!`);
                 cancelEdit(); // Limpa o formulário
-                // Não precisa chamar populateLoginCompanies aqui, o listener de realtime fará isso
+                // A atualização da lista de empresas e do select de login será feita pelo listener de realtime
                 // await populateLoginCompanies();
-                await loadCompanyManagement(); // Recarrega a lista de empresas
+                // await loadCompanyManagement();
             }
         }
 
@@ -1142,8 +1171,9 @@
                 console.error("Erro Supabase (Company Delete):", error);
             } else {
                 alert(`Empresa "${name}" excluída com sucesso.`);
-                 // Não precisa chamar populateLoginCompanies aqui, o listener de realtime fará isso
-                await loadCompanyManagement(); // Recarrega a lista
+                 // A atualização da lista de empresas e do select de login será feita pelo listener de realtime
+                // await populateLoginCompanies();
+                // await loadCompanyManagement();
             }
         }
 
@@ -1412,9 +1442,8 @@
             } else {
                 alert(`Usuário "${data[0].name}" ${id ? 'atualizado' : 'adicionado'} com sucesso!`);
                 cancelUserEdit(); // Limpa o formulário
-                // Não precisa chamar loadCompanyUsers aqui, o listener de realtime fará isso
+                // A atualização da lista será feita pelo listener de realtime
                 // await loadCompanyUsers();
-                // Não precisa chamar refreshAllUsers aqui, o listener de realtime fará isso
             }
         }
 
@@ -1428,7 +1457,8 @@
                 console.error("Erro Supabase (User Delete):", error);
             } else {
                 alert(`Usuário "${name}" excluído com sucesso.`);
-                // Não precisa chamar loadCompanyUsers ou refreshAllUsers aqui, o listener de realtime fará isso
+                // A atualização da lista será feita pelo listener de realtime
+                // await loadCompanyUsers();
             }
         }
 
