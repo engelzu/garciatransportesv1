@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 
 // Chave da API Geoapify fornecida por você 
-const GEOAPIFY_API_KEY = '3bd73ecada1d478a8c9473ad4115be38';
+const GEOAPIFY_API_KEY = '9452fa947c234c90b794bf2d1b8c5eb4';
 
 export default async function handler(req, res) {
   const { origins, destinations } = req.query;
@@ -66,4 +66,5 @@ export default async function handler(req, res) {
     console.error('Erro ao chamar a API do Geoapify:', error);
     res.status(500).json({ error: 'Erro ao buscar a distância da API do Geoapify' });
   }
+
 }
