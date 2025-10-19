@@ -3,90 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Autocomplete Geoapify</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/themes/minimal.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
+    <title>Teste Mínimo Geoapify</title>
+    <link rel="stylesheet" href="https://unpkg.com/@geoapify/geocoder-autocomplete@2.0.1/dist/themes/minimal.css" />
+    <script src="https://unpkg.com/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
 
     <style>
-        /* Estilos CSS (permanecem os mesmos) */
-        body { background-color: #111827; color: white; font-family: sans-serif; padding: 20px; }
-        .container { max-width: 500px; margin: 40px auto; padding: 20px; background-color: #1f2937; border-radius: 8px; border: 1px solid #4b5563; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 4px; border: 1px solid #4b5563; background-color: #374151; color: white; box-sizing: border-box; }
-        input:focus { border-color: #00ffff; outline: none; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5); }
-        .geoapify-autocomplete-input { color: white !important; }
-        .geoapify-autocomplete-items { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; z-index: 1000 !important; max-height: 250px; overflow-y: auto; }
+        body { background-color: #1f2937; color: white; padding: 20px; font-family: sans-serif; }
+        input { width: 90%; padding: 8px; margin-bottom: 15px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 4px; }
+        .autocomplete-container { position: relative; margin-bottom: 20px; }
+        /* Estilos básicos para o dropdown (copiados da tentativa anterior) */
+        .geoapify-autocomplete-items { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; z-index: 1000 !important; }
         .geoapify-autocomplete-items div { padding: 10px !important; cursor: pointer; font-size: 14px; color: white !important; }
         .geoapify-autocomplete-items div:hover { background-color: #4b5563 !important; }
         .geoapify-autocomplete-item.active { background-color: #00ffff !important; color: black !important; }
-        .autocomplete-container { position: relative; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1 style="text-align: center; margin-bottom: 30px;">Teste Geoapify Autocomplete</h1>
-        <div class="autocomplete-container">
-            <label for="origem">Origem:</label>
-            <input type="text" id="origem" placeholder="Digite o endereço de origem">
-        </div>
-        <div class="autocomplete-container">
-            <label for="destino">Destino:</label>
-            <input type="text" id="destino" placeholder="Digite o endereço de destino">
-        </div>
-        <div id="result-origem" style="margin-top: 10px; font-size: 12px; color: #9ca3af;"></div>
-        <div id="result-destino" style="margin-top: 10px; font-size: 12px; color: #9ca3af;"></div>
+    <h1>Teste Mínimo Geoapify Autocomplete</h1>
+
+    <div class="autocomplete-container">
+        <label for="origem-teste">Origem:</label>
+        <input type="text" id="origem-teste" placeholder="Digite origem">
     </div>
 
+    <div class="autocomplete-container">
+        <label for="destino-teste">Destino:</label>
+        <input type="text" id="destino-teste" placeholder="Digite destino">
+    </div>
+
+    <div id="status-teste" style="margin-top: 20px; color: #facc15;">Aguardando inicialização...</div>
+
     <script>
-        // Este script agora executa DEPOIS que todo o HTML foi lido
-        // e DEPOIS que o script da biblioteca (no head) foi baixado e executado.
+        // Executa o script DEPOIS que a página carregar
+        window.addEventListener('load', () => {
+            const statusDiv = document.getElementById('status-teste');
+            const geoapifyApiKey = '3bd73ecada1d478a8c9473ad4115be38'; // Sua chave API
 
-        const geoapifyApiKey = '3bd73ecada1d478a8c9473ad4115be38';
-        const origemInput = document.getElementById('origem');
-        const destinoInput = document.getElementById('destino');
-        const resultOrigem = document.getElementById('result-origem');
-        const resultDestino = document.getElementById('result-destino');
+            // Verifica se a biblioteca Autocomplete foi definida
+            if (typeof Autocomplete !== 'undefined') {
+                statusDiv.textContent = "Biblioteca carregada. Inicializando...";
+                console.log("Biblioteca Autocomplete DEFINIDA. Inicializando...");
 
-        // Verifica se Autocomplete existe AGORA (deve existir se o script no head carregou)
-        if (typeof Autocomplete !== 'undefined') {
-            console.log("Biblioteca Autocomplete DEFINIDA no final do body. Inicializando...");
+                try {
+                    // Inicializa Origem
+                    new Autocomplete(document.getElementById('origem-teste'), {
+                        apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt'
+                    });
+                    console.log("Autocomplete Origem OK.");
 
-            try {
-                // Inicializa para o campo Origem
-                const autocompleteOrigem = new Autocomplete(origemInput, {
-                    apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt', placeholder: origemInput.placeholder
-                });
-                autocompleteOrigem.on('select', (feature) => {
-                    resultOrigem.textContent = feature ? `Selecionado: ${feature.properties.formatted} (Lat: ${feature.properties.lat}, Lon: ${feature.properties.lon})` : '';
-                });
-                console.log("Autocomplete inicializado para Origem.");
-            } catch (e) {
-                console.error("Erro ao inicializar autocomplete para Origem:", e);
-                resultOrigem.textContent = "Erro ao inicializar autocomplete para Origem.";
-             }
+                    // Inicializa Destino
+                    new Autocomplete(document.getElementById('destino-teste'), {
+                        apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt'
+                    });
+                    console.log("Autocomplete Destino OK.");
 
-            try {
-                // Inicializa para o campo Destino
-                const autocompleteDestino = new Autocomplete(destinoInput, {
-                    apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt', placeholder: destinoInput.placeholder
-                });
-                autocompleteDestino.on('select', (feature) => {
-                     resultDestino.textContent = feature ? `Selecionado: ${feature.properties.formatted} (Lat: ${feature.properties.lat}, Lon: ${feature.properties.lon})` : '';
-                });
-                console.log("Autocomplete inicializado para Destino.");
-            } catch (e) {
-                 console.error("Erro ao inicializar autocomplete para Destino:", e);
-                 resultDestino.textContent = "Erro ao inicializar autocomplete para Destino.";
+                    statusDiv.textContent = "Autocomplete inicializado com sucesso! Teste a digitação.";
+                    statusDiv.style.color = "#22c55e"; // Verde
+
+                } catch (e) {
+                    console.error("Erro ao inicializar Autocomplete:", e);
+                    statusDiv.textContent = "ERRO ao inicializar Autocomplete. Verifique o console.";
+                    statusDiv.style.color = "#ef4444"; // Vermelho
+                }
+
+            } else {
+                console.error("ERRO CRÍTICO: A biblioteca Autocomplete NÃO está definida após window.onload.");
+                statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete não carregou. Verifique Console/Rede.";
+                statusDiv.style.color = "#ef4444"; // Vermelho
             }
-
-        } else {
-            // Se ainda não estiver definido aqui, o problema é mais sério (falha no download/execução do script da lib)
-            console.error("ERRO GRAVE: A biblioteca Autocomplete do Geoapify NÃO está definida mesmo no final do body.");
-            resultOrigem.textContent = "ERRO GRAVE: A biblioteca Autocomplete do Geoapify não foi carregada.";
-            alert("Erro GRAVE ao carregar a biblioteca. Verifique console/network.");
-        }
-
+        });
     </script>
 
 </body>
