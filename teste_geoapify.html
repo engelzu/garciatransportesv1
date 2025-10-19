@@ -3,20 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Mínimo Geoapify (Tutorial)</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/minimal.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
+    <title>Teste Mínimo Geoapify (Sem CSS Externo)</title>
+    <script src="https://unpkg.com/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
 
     <style>
         body { background-color: #1f2937; color: white; padding: 20px; font-family: sans-serif; }
         input { width: 90%; padding: 8px; margin-bottom: 15px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 4px; }
         .autocomplete-container { position: relative; margin-bottom: 20px; }
-        /* Estilos básicos para o dropdown */
-        .geoapify-autocomplete-items { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; z-index: 1000 !important; }
-        .geoapify-autocomplete-items div { padding: 10px !important; cursor: pointer; font-size: 14px; color: white !important; }
-        .geoapify-autocomplete-items div:hover { background-color: #4b5563 !important; }
-        .geoapify-autocomplete-item.active { background-color: #00ffff !important; color: black !important; }
-        /* Estilo para o input ficar parecido com o tema minimal */
+
+        /* Estilos INLINE para o dropdown (ESSENCIAIS AGORA) */
+        .geoapify-autocomplete-items {
+            position: absolute; /* Garante posicionamento correto */
+            left: 0;
+            right: 0;
+            background-color: #374151 !important;
+            border: 1px solid #4b5563 !important;
+            border-top: none; /* Evita borda dupla */
+            border-radius: 0 0 4px 4px; /* Arredonda cantos inferiores */
+            color: white !important;
+            z-index: 1000 !important;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: -1px; /* Encosta no input */
+        }
+        .geoapify-autocomplete-items div { /* Estilo do item */
+            padding: 10px !important;
+            cursor: pointer;
+            font-size: 14px;
+            color: white !important;
+        }
+        .geoapify-autocomplete-items div:hover { /* Item hover */
+            background-color: #4b5563 !important;
+        }
+        .geoapify-autocomplete-item.active { /* Item selecionado (teclado/mouse) */
+            background-color: #00ffff !important; /* Ciano */
+            color: black !important;
+        }
+        /* Estilo para o input (mantido) */
         .geoapify-autocomplete-input { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 4px !important; padding: 8px !important; width: 90% !important; box-sizing: border-box !important; }
         input:focus { border-color: #00ffff !important; outline: none !important; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5) !important; }
     </style>
@@ -45,7 +68,7 @@
 
             // Verifica se a biblioteca Autocomplete foi definida
             if (typeof Autocomplete !== 'undefined') {
-                statusDiv.textContent = "Biblioteca carregada. Inicializando...";
+                statusDiv.textContent = "Biblioteca JS carregada. Inicializando...";
                 console.log("Biblioteca Autocomplete DEFINIDA. Inicializando...");
 
                 try {
@@ -61,7 +84,7 @@
                     });
                     console.log("Autocomplete Destino OK.");
 
-                    statusDiv.textContent = "Autocomplete inicializado com sucesso! Teste a digitação.";
+                    statusDiv.textContent = "Autocomplete inicializado! Teste a digitação.";
                     statusDiv.style.color = "#22c55e"; // Verde
 
                 } catch (e) {
@@ -72,7 +95,7 @@
 
             } else {
                 console.error("ERRO CRÍTICO: A biblioteca Autocomplete NÃO está definida após window.onload.");
-                statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete não carregou. Verifique Console/Rede.";
+                statusDiv.textContent = "ERRO CRÍTICO: Biblioteca Autocomplete JS não carregou. Verifique Console/Rede.";
                 statusDiv.style.color = "#ef4444"; // Vermelho
             }
         });
