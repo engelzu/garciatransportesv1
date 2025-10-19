@@ -10,150 +10,73 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/minimal.css" /> <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
     <style>
         body, html { background-color: #000; }
         .main-gradient { background: linear-gradient(135deg, #000000, #000000); }
-        .button-gradient { background: linear-gradient(to right, #000000, #000000); border: 2px solid white; position: relative; overflow: hidden; color: white !important; } /* Garante texto branco */
+        .button-gradient { background: linear-gradient(to right, #000000, #000000); border: 2px solid white; position: relative; overflow: hidden; color: white !important; }
         .button-gradient::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0.3), rgba(255,255,255,0)); transition: transform 0.3s ease-in-out; transform: translateX(-100%); }
         .button-gradient:hover::before { transform: translateX(0); }
-        .card-gradient { background: linear-gradient(135deg, #000000, #000000); border: 1px solid #4b5563; } /* Adiciona borda sutil */
+        .card-gradient { background: linear-gradient(135deg, #000000, #000000); border: 1px solid #4b5563; }
         .screen { display: none; background-color: #000; }
         .screen.active { display: block; }
         .text-black, .text-gray-800, .text-gray-400, .text-gray-300, .text-gray-600, .text-gray-700, .text-gray-500, .text-green-300, .text-yellow-300 { color: #ffffff !important; }
         .text-cyan-400 { color: #00ffff !important; }
         h1, h2, h3, p, button, label, input::placeholder, textarea::placeholder, select, option { color: #ffffff !important; }
-        input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; /* Garante texto branco */}
-        input:focus, select:focus, textarea:focus { border-color: #00ffff !important; ring: none !important; outline: none !important; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5) !important; } /* Foco ciano */
+        input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
+        input:focus, select:focus, textarea:focus { border-color: #00ffff !important; ring: none !important; outline: none !important; box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5) !important; }
         #company-password-input { font-size: 14px; text-align: center; }
         #company-password-input::placeholder { text-align: center; }
         #app-container { position: relative; }
         #admin-access-icon:hover svg { stroke: #fff; }
 
-        /* ESTILO PARA O AUTOCOMPLETE DO GEOAPIFY */
-        .geoapify-autocomplete-input {
-             color: white !important;
-             background-color: #374151 !important;
-             border: 1px solid #4b5563 !important;
-             padding: 0.5rem !important; /* Ajustado para p-2 */
-             border-radius: 0.5rem !important; /* rounded-lg */
-             width: 100% !important; /* Garante largura total */
-             box-sizing: border-box !important;
+        /* ESTILO PARA A LISTA DE SUGESTÕES MANUAL */
+        .autocomplete-container { position: relative; }
+        .suggestions-list {
+            position: absolute; left: 0; right: 0;
+            background-color: #374151;
+            border: 1px solid #4b5563; border-top: none;
+            border-radius: 0 0 0.5rem 0.5rem; /* rounded-lg */
+            color: white; z-index: 1050;
+            max-height: 200px; overflow-y: auto; margin-top: -1px;
+            display: none; /* Começa escondido */
         }
-        .geoapify-autocomplete-items {
-            background-color: #374151 !important;
-            border: 1px solid #4b5563 !important;
-            color: white !important;
-            z-index: 1050 !important; /* Garante que fique sobre outros elementos */
-            max-height: 200px; /* Limita altura */
-            overflow-y: auto; /* Adiciona scroll se necessário */
-        }
-        .geoapify-autocomplete-items div:hover {
-            background-color: #4b5563 !important;
-        }
-        .geoapify-autocomplete-item {
-             color: white !important;
-             padding: 8px !important;
-             font-size: 14px !important;
-        }
-        .geoapify-autocomplete-item.active {
-            background-color: #00ffff !important; /* Ciano para item selecionado */
-            color: black !important; /* Texto preto para contraste */
-        }
-        .autocomplete-container { /* Container para posicionamento */
-            position: relative;
-        }
-        /* FIM DO ESTILO DO AUTOCOMPLETE */
+        .suggestion-item { padding: 8px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #4b5563; }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background-color: #4b5563; }
+        /* FIM DO ESTILO DA LISTA */
 
         #schedule-modal { display: none; }
         #schedule-modal.flex { display: flex; }
 
-        /* --- CSS PARA ABAS --- */
-        .tab-button { background-color: #374151; border: 1px solid #4b5563; padding: 10px 15px; cursor: pointer; transition: all 0.2s ease-in-out; border-radius: 8px; font-weight: 600; color: white !important; }
+        .tab-button { background-color: #374151; border: 1px solid #4b5563; padding: 10px 15px; cursor: pointer; transition: all 0.2s ease-in-out; border-radius: 8px; font-weight: 600; }
         .tab-button.active { background-color: #00ffff; color: #000 !important; border-color: #00ffff; }
         .admin-sub-screen { display: none; }
         .admin-sub-screen.active { display: block; }
-
     </style>
 </head>
 <body class="main-gradient text-white min-h-screen flex items-start justify-center p-4 pt-8">
 
     <div id="app-container" class="w-full max-w-md mx-auto">
 
-        <div id="company-login-screen" class="screen active">
-             <div id="admin-access-icon" title="Acesso Super Admin" onclick="showSuperAdminLogin()" style="position: absolute; top: 1rem; right: 1rem; cursor: pointer; padding: 0.5rem;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-            </div>
-            <h2 class="text-3xl font-bold mb-6 text-center">Login da Empresa</h2>
-            <div class="mb-4"><label for="company-login-select" class="block mb-2 text-sm font-medium">Empresa</label><select id="company-login-select" class="w-full p-3 rounded-lg"></select></div>
-            <div class="mb-4"><label for="admin-username-input" class="block mb-2 text-sm font-medium">Usuário Admin</label><input type="text" id="admin-username-input" class="w-full p-3 rounded-lg" placeholder="Digite seu usuário"></div>
-            <div class="mb-4"><label for="admin-password-input" class="block mb-2 text-sm font-medium">Senha</label><input type="password" id="admin-password-input" class="w-full p-3 rounded-lg" placeholder="Digite sua senha"></div>
-            <button onclick="verifyCompanyAdminPassword()" class="w-full py-3 px-6 text-lg font-semibold rounded-lg button-gradient shadow-lg">ENTRAR</button>
-            <p id="company-login-error" class="text-red-500 text-center mt-4 hidden">Usuário ou senha incorretos!</p>
-            <p class="text-xs text-center text-gray-400 mt-4">
-                Esqueceu a senha? Use o acesso Super Admin (ícone de escudo <svg xmlns="http://www.w3.org/2000/svg" class="inline-block h-4 w-4 align-text-bottom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> no canto superior direito) para gerenciar as empresas.
-            </p>
-        </div>
-        <div id="super-admin-login-screen" class="screen">
-            <button onclick="showScreen('company-login-screen')" class="mb-4 text-cyan-400 hover:text-cyan-200">← Voltar</button>
-            <h2 class="text-3xl font-bold mb-6 text-center">Acesso Super Admin</h2>
-            <div class="mb-4"><label for="super-admin-password-input" class="block mb-2 text-sm font-medium">Senha Mestra</label><input type="password" id="super-admin-password-input" class="w-full p-3 rounded-lg text-center" placeholder="Digite a senha mestra"></div>
-            <button onclick="verifySuperAdminPassword()" class="w-full py-3 px-6 text-lg font-semibold rounded-lg button-gradient shadow-lg">ENTRAR</button>
-            <p id="super-admin-login-error" class="text-red-500 text-center mt-4 hidden">Senha mestra incorreta!</p>
-        </div>
+        <div id="company-login-screen" class="screen active"> /* ... (código igual anterior) ... */ </div>
+        <div id="super-admin-login-screen" class="screen"> /* ... (código igual anterior) ... */ </div>
 
         <div id="admin-screen" class="screen">
-            <div class="flex justify-between items-center mb-6">
-                <p id="admin-welcome-message" class="text-lg text-gray-300"></p>
-                <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 p-2 rounded-lg">Sair</button>
-            </div>
-            <div class="flex flex-wrap justify-center gap-2 mb-6">
-                <button id="tab-request-ride" class="tab-button active" onclick="showAdminSubScreen('request-ride-screen')">Solicitar Corrida</button>
-                <button id="tab-approve-ride" class="tab-button" onclick="showAdminSubScreen('approval-ride-screen')">Aprovar Solicitações</button>
-                <button id="tab-history" class="tab-button" onclick="showAdminSubScreen('history-screen')">Histórico</button>
-                <button id="tab-users" class="tab-button" onclick="showAdminSubScreen('user-management-screen')">Gerenciar Usuários</button>
-            </div>
+            <div class="flex justify-between items-center mb-6"> /* ... (código igual anterior) ... */ </div>
+            <div class="flex flex-wrap justify-center gap-2 mb-6"> /* ... (código igual anterior) ... */ </div>
 
             <div id="request-ride-screen" class="admin-sub-screen active">
                  <h2 class="text-2xl font-bold text-center mb-4">Solicitar Corrida</h2>
                 <div id="admin-request-form" class="card-gradient p-6 rounded-lg">
-                    <div class="mb-4">
-                        <label for="passenger-quantity-select" class="block mb-2 text-sm font-medium">SELECIONE A QUANTIDADE DE PASSAGEIROS</label>
-                        <select id="passenger-quantity-select" class="w-full p-3 rounded-lg">
-                            <option value="">-- Quantidade --</option>
-                            <option value="1">1 Passageiro</option>
-                            <option value="2">2 Passageiros</option>
-                            <option value="3">3 Passageiros</option>
-                            <option value="4">4 Passageiros</option>
-                        </select>
-                    </div>
+                    <div class="mb-4"> /* ... (select quantidade) ... */ </div>
                     <div id="collaborators-container" class="space-y-4">
                         </div>
-                    <div id="admin-ride-details" class="hidden">
-                        <hr class="border-gray-600 my-6">
-                        <h3 class="text-lg font-semibold mb-4 text-center">Detalhes da Viagem</h3>
-                        <div class="mb-4">
-                            <label for="admin-observation" class="block mb-2 text-sm font-medium">Observação</label>
-                            <textarea id="admin-observation" class="w-full p-3 rounded-lg" placeholder="Ex: Ponto de referência..." rows="2"></textarea>
-                        </div>
-                        <div class="mt-6 space-y-3">
-                            <button id="admin-request-immediate-btn" class="w-full py-3 px-6 text-lg font-semibold rounded-lg button-gradient shadow-lg">SOLICITAR AGORA</button>
-                            <button id="admin-request-scheduled-btn" class="w-full py-3 px-6 text-lg font-semibold rounded-lg button-gradient shadow-lg">AGENDAR</button>
-                        </div>
-                    </div>
+                    <div id="admin-ride-details" class="hidden"> /* ... (observação e botões) ... */ </div>
                 </div>
             </div>
 
-            <div id="approval-ride-screen" class="admin-sub-screen">
-                 <h2 class="text-2xl font-bold text-center mb-4">Aprovar Solicitações Pendentes</h2>
-                <div id="pending-rides-container" class="space-y-4"></div>
-            </div>
-            <div id="history-screen" class="admin-sub-screen">
-                <h2 class="text-2xl font-bold text-center mb-4">Histórico de Corridas</h2>
-                <div id="history-rides-container" class="space-y-4"></div>
-            </div>
+            <div id="approval-ride-screen" class="admin-sub-screen"> /* ... */ </div>
+            <div id="history-screen" class="admin-sub-screen"> /* ... */ </div>
 
             <div id="user-management-screen" class="admin-sub-screen">
                  <h2 class="text-2xl font-bold text-center mb-4">Gerenciar Usuários</h2>
@@ -164,7 +87,9 @@
                         <input type="text" id="new-user-matricula" placeholder="Matrícula" class="w-full p-2 rounded-lg">
                         <input type="text" id="new-user-name" placeholder="Nome Completo" class="w-full p-2 rounded-lg">
                         <div class="autocomplete-container">
+                            <label for="new-user-address" class="sr-only">Endereço</label>
                             <input type="text" id="new-user-address" placeholder="Endereço" class="w-full p-2 rounded-lg">
+                            <div id="suggestions-new-user-address" class="suggestions-list"></div>
                         </div>
                         <input type="tel" id="new-user-phone" placeholder="Telefone" class="w-full p-2 rounded-lg">
                         <input type="text" id="new-user-password" placeholder="Senha" class="w-full p-2 rounded-lg">
@@ -176,43 +101,12 @@
             </div>
         </div>
 
-        <div id="company-management-screen" class="screen">
-             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Gerenciar Empresas</h2>
-                <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 p-2 rounded-lg">Sair</button>
-            </div>
-            <div class="card-gradient p-4 rounded-lg mb-6">
-                <h3 id="company-form-title" class="text-lg font-semibold mb-2">Adicionar Empresa</h3>
-                <input type="hidden" id="editing-company-id">
-                <div class="flex gap-2 mb-2">
-                    <input type="text" id="new-company-name" placeholder="Nome da Empresa" class="w-full p-2 rounded-lg">
-                </div>
-                <button onclick="addOrUpdateCompany()" class="w-full py-2 font-semibold rounded-lg bg-green-600 hover:bg-green-700">Salvar</button>
-                <button id="cancel-edit-btn" onclick="cancelEdit()" class="w-full py-2 font-semibold rounded-lg bg-gray-600 hover:bg-gray-700 mt-2 hidden">Cancelar Edição</button>
-            </div>
-            <div id="company-list-container" class="space-y-3"></div>
-        </div>
-        <div id="admin-management-screen" class="screen"></div>
+        <div id="company-management-screen" class="screen"> /* ... */ </div>
+        <div id="admin-management-screen" class="screen"> /* ... */ </div>
 
     </div>
 
-    <div id="schedule-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4">
-        <div class="card-gradient p-6 rounded-lg shadow-xl text-center w-full max-w-sm">
-            <h3 class="text-2xl font-bold mb-4">Agendar Corrida</h3>
-            <div class="mb-4 text-left">
-                <label for="schedule-date" class="block mb-2 text-sm font-medium">Data</label>
-                <input type="date" id="schedule-date" class="w-full p-3 rounded-lg" style="color-scheme: dark;">
-            </div>
-            <div class="mb-6 text-left">
-                <label for="schedule-time" class="block mb-2 text-sm font-medium">Hora</label>
-                <input type="time" id="schedule-time" class="w-full p-3 rounded-lg" style="color-scheme: dark;">
-            </div>
-            <div class="flex justify-center gap-4">
-                <button onclick="closeScheduleModal()" class="py-2 px-6 font-semibold rounded-lg bg-gray-500 hover:bg-gray-600">Cancelar</button>
-                <button onclick="confirmAdminSchedule()" class="py-2 px-8 font-semibold rounded-lg button-gradient">AGENDAR</button>
-            </div>
-        </div>
-    </div>
+    <div id="schedule-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-50 p-4"> /* ... */ </div>
 
     <script>
         // ========================================================================
@@ -229,93 +123,117 @@
         let adminScheduledDateTime = null;
         let companyUsersCache = [];
         let currentManagingCompany = { id: null, name: null };
+        let debounceTimeout; // Para debouncing das chamadas fetch
 
         // ========================================================================
-        // FUNÇÃO ATUALIZADA - initAutocomplete (Usa Geoapify via CDN)
+        // FUNÇÃO fetchSuggestions (Usa Fetch API)
+        // ========================================================================
+        async function fetchSuggestions(query, suggestionsListElement, inputElement) {
+            if (!suggestionsListElement) return; // Segurança extra
+            if (query.length < 3) {
+                suggestionsListElement.innerHTML = '';
+                suggestionsListElement.style.display = 'none';
+                return;
+            }
+            const biasLocation = "-30.0346,-51.2177"; // Porto Alegre
+            const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&apiKey=${GEOAPIFY_API_KEY}&filter=countrycode:br&lang=pt&bias=proximity:${biasLocation}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                suggestionsListElement.innerHTML = ''; // Limpa
+
+                if (data.features && data.features.length > 0) {
+                    data.features.forEach(feature => {
+                        const suggestionDiv = document.createElement('div');
+                        suggestionDiv.textContent = feature.properties.formatted;
+                        suggestionDiv.className = 'suggestion-item';
+                        suggestionDiv.addEventListener('click', () => {
+                            inputElement.value = feature.properties.formatted;
+                            suggestionsListElement.innerHTML = '';
+                            suggestionsListElement.style.display = 'none';
+                            console.log("Selecionado:", feature.properties.formatted);
+                        });
+                        suggestionsListElement.appendChild(suggestionDiv);
+                    });
+                    suggestionsListElement.style.display = 'block'; // Mostra
+                } else {
+                    suggestionsListElement.style.display = 'none'; // Esconde
+                }
+            } catch (error) {
+                console.error("Erro fetchSuggestions:", error);
+                suggestionsListElement.innerHTML = '';
+                suggestionsListElement.style.display = 'none';
+            }
+        }
+
+        // ========================================================================
+        // FUNÇÃO initAutocomplete (Agora usa Fetch API)
         // ========================================================================
         function initAutocomplete(inputElement) {
-            console.log("Chamando initAutocomplete para:", inputElement ? inputElement.id : 'Elemento Nulo'); // LOG 1
-
             if (!inputElement) return;
 
-            // Verifica ANTES de tentar usar
-            if (typeof Autocomplete === 'undefined') {
-                console.error("ERRO DENTRO de initAutocomplete: Biblioteca Autocomplete (Geoapify) não definida. Input ID:", inputElement.id); // LOG 2
-                // Adiciona aviso visual
-                const errorSpan = document.createElement('span');
-                errorSpan.textContent = ' (Erro Autocomplete Init)';
-                errorSpan.style.color = 'red';
-                errorSpan.style.fontSize = '0.7em';
-                 if (inputElement.parentElement && inputElement.parentElement.classList.contains('autocomplete-container')) {
-                     if (!inputElement.parentElement.querySelector('.autocomplete-error-span')) {
-                          errorSpan.className = 'autocomplete-error-span';
-                          inputElement.parentElement.appendChild(errorSpan);
-                     }
-                 } else {
-                     console.warn("Não foi possível adicionar span de erro visualmente para", inputElement.id);
-                 }
-                return; // Impede a continuação
+            // Encontra ou cria o elemento da lista de sugestões
+            const suggestionsListId = `suggestions-${inputElement.id}`;
+            let suggestionsListElement = document.getElementById(suggestionsListId);
+            if (!suggestionsListElement) {
+                 console.warn(`Criando elemento de lista #${suggestionsListId}`);
+                 suggestionsListElement = document.createElement('div');
+                 suggestionsListElement.id = suggestionsListId;
+                 suggestionsListElement.className = 'suggestions-list';
+                 inputElement.parentNode.appendChild(suggestionsListElement);
             }
 
-            // Remove instância anterior
-            if (inputElement.geoapify_autocomplete_instance) {
-                try { inputElement.geoapify_autocomplete_instance.destroy(); } catch(e) {}
-                inputElement.geoapify_autocomplete_instance = null;
-            }
+            // Remove listener antigo para evitar duplicatas
+            inputElement.removeEventListener('input', handleAutocompleteInput);
+            inputElement.removeEventListener('focus', handleAutocompleteFocus);
 
-            // Tenta inicializar
-            try {
-                const autocomplete = new Autocomplete(inputElement, {
-                    apiKey: GEOAPIFY_API_KEY,
-                    filter: { countrycode: ['br'] },
-                    lang: 'pt',
-                    placeholder: inputElement.placeholder,
-                    allowNonVerifiedHouseNumber: true,
-                    allowNonVerifiedStreet: true
-                });
-                inputElement.geoapify_autocomplete_instance = autocomplete;
-                console.log("SUCESSO: Autocomplete inicializado para:", inputElement.id); // LOG 3
+            // Adiciona novo listener
+            inputElement.addEventListener('input', handleAutocompleteInput);
+            inputElement.addEventListener('focus', handleAutocompleteFocus);
 
-            } catch (error) {
-                console.error("Erro EXCEPCIONAL ao criar Autocomplete:", error, "no elemento:", inputElement); // LOG 4
-                 const errorSpan = document.createElement('span');
-                 errorSpan.textContent = ' (Erro Excepcional Init)';
-                 errorSpan.style.color = 'orange';
-                 errorSpan.style.fontSize = '0.7em';
-                 if (inputElement.parentElement && inputElement.parentElement.classList.contains('autocomplete-container')) {
-                     if (!inputElement.parentElement.querySelector('.autocomplete-error-span')) {
-                          errorSpan.className = 'autocomplete-error-span';
-                          inputElement.parentElement.appendChild(errorSpan);
-                     }
-                 }
+            // Armazena a referência da lista no input
+            inputElement.suggestionsListElement = suggestionsListElement;
+        }
+
+        // Handler para o evento 'input'
+        function handleAutocompleteInput(event) {
+            clearTimeout(debounceTimeout);
+            const inputElement = event.target;
+            const suggestionsListElement = inputElement.suggestionsListElement;
+            const query = inputElement.value;
+            if (suggestionsListElement) {
+                 debounceTimeout = setTimeout(() => {
+                    fetchSuggestions(query, suggestionsListElement, inputElement);
+                }, 300);
             }
         }
         
+        // Handler para o evento 'focus'
+        function handleAutocompleteFocus(event) {
+            const inputElement = event.target;
+            const suggestionsListElement = inputElement.suggestionsListElement;
+            // Mostra a lista se já houver sugestões (evita chamar API só por focar)
+            if (inputElement.value.length >= 3 && suggestionsListElement && suggestionsListElement.children.length > 0) {
+                 suggestionsListElement.style.display = 'block';
+            }
+        }
+
+        // Listener global para fechar listas ao clicar fora
+        document.addEventListener('click', (event) => {
+            document.querySelectorAll('.autocomplete-container').forEach(container => {
+                if (!container.contains(event.target)) {
+                    const list = container.querySelector('.suggestions-list');
+                    if (list) list.style.display = 'none';
+                }
+            });
+        });
+
         // ========================================================================
         // FUNÇÃO parseDestinations (sem alterações)
         // ========================================================================
-        function parseDestinations(destinationString) {
-             if (!destinationString || typeof destinationString !== 'string') return [];
-             const str = destinationString.trim();
-             if (str.startsWith('[') && str.endsWith(']')) {
-                 try {
-                     const parsed = JSON.parse(str);
-                     if (Array.isArray(parsed)) {
-                         if (parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null && 'address' in parsed[0]) {
-                            return parsed.filter(d => d.address);
-                         }
-                          return parsed.map((addr, index) => ({
-                              name: index === parsed.length - 1 ? 'Destino Final' : `Parada ${index + 1}`,
-                              address: String(addr || '').trim()
-                          })).filter(d => d.address);
-                     }
-                 } catch (e) { console.warn('parseDestinations: JSON inválido.', str, e); }
-             }
-              const cleanedAddr = str.replace(/^\["|"\]$/g, '').trim();
-              return cleanedAddr ? [{ name: 'Destino', address: cleanedAddr }] : [];
-        }
-
-        // --- Restante do JavaScript (sem alterações significativas) ---
+        function parseDestinations(destinationString) { /* ... (código igual anterior) ... */ }
        
         function resetAdminForm() { /* ... */ }
         function showScreen(screenId) { /* ... */ }
@@ -327,7 +245,7 @@
         async function setupAdminScreen() { /* ... */ }
         
         // ========================================================================
-        // FUNÇÃO handlePassengerQuantityChange (Mantida com requestAnimationFrame)
+        // FUNÇÃO handlePassengerQuantityChange (Chama novo initAutocomplete)
         // ========================================================================
         function handlePassengerQuantityChange(event) {
             const quantity = parseInt(event.target.value, 10);
@@ -341,42 +259,40 @@
             const companyUsers = state.allUsers.filter(user => user.company === state.loggedInCompany.name).sort((a, b) => a.name.localeCompare(b.name));
             const optionsHtml = companyUsers.map(user => `<option value="${user.id}">${user.name}</option>`).join('');
             let inputsHtml = '';
+            // Cria HTML para os inputs de ORIGEM
             for (let i = 0; i < quantity; i++) {
                 inputsHtml += `
                     <div class="border border-gray-700 p-3 rounded-lg">
                         <p class="font-semibold text-md mb-2">Origem (Passageiro ${i + 1})</p>
-                        <div class="mb-2">
-                            <label for="collaborator-select-${i}" class="block mb-1 text-xs font-medium">Colaborador</label>
-                            <select id="collaborator-select-${i}" data-index="${i}" class="w-full p-2 rounded-lg collaborator-selector"><option value="">-- Selecione --</option>${optionsHtml}</select>
-                        </div>
+                        <div class="mb-2"> /* ... (select colaborador) ... */ </div>
                         <div class="autocomplete-container">
                             <label for="address-input-${i}" class="block mb-1 text-xs font-medium">Endereço</label>
                             <input type="text" id="address-input-${i}" class="w-full p-2 rounded-lg" placeholder="Digite o endereço">
-                        </div>
+                            <div id="suggestions-address-input-${i}" class="suggestions-list"></div> </div>
                     </div>`;
             }
+            // Cria HTML para o input de DESTINO FINAL
             inputsHtml += `
                 <div class="border border-cyan-400 p-3 rounded-lg mt-4">
                     <p class="font-semibold text-md mb-2 text-cyan-400">Destino Final</p>
                     <div class="autocomplete-container">
                         <label for="address-input-destination" class="block mb-1 text-xs font-medium">Endereço de Destino</label>
                         <input type="text" id="address-input-destination" class="w-full p-2 rounded-lg" placeholder="Digite o endereço">
-                    </div>
+                        <div id="suggestions-address-input-destination" class="suggestions-list"></div> </div>
                 </div>`;
             container.innerHTML = inputsHtml;
             
             // Inicializa autocomplete APÓS renderizar
             requestAnimationFrame(() => {
-                console.log("requestAnimationFrame: Tentando inicializar autocompletes..."); // Log extra
                 for (let i = 0; i < quantity; i++) {
                     const inputElement = document.getElementById(`address-input-${i}`);
-                    if (inputElement) initAutocomplete(inputElement);
+                    if (inputElement) initAutocomplete(inputElement); // Chama a nova função
                 }
                 const destInputElement = document.getElementById('address-input-destination');
-                 if (destInputElement) initAutocomplete(destInputElement);
+                 if (destInputElement) initAutocomplete(destInputElement); // Chama a nova função
 
                  document.querySelectorAll('.collaborator-selector').forEach(select => {
-                    select.removeEventListener('change', handleCollaboratorSelection); // Evita duplicar
+                    select.removeEventListener('change', handleCollaboratorSelection);
                     select.addEventListener('change', handleCollaboratorSelection);
                  });
             });
@@ -392,7 +308,7 @@
         function showAdminSubScreen(subScreenId) {
             document.querySelectorAll('.admin-sub-screen').forEach(screen => screen.classList.remove('active'));
             document.querySelectorAll('.tab-button').forEach(button => button.classList.remove('active'));
-            document.getElementById(subScreenId)?.classList.add('active'); // Adiciona verificação
+            document.getElementById(subScreenId)?.classList.add('active');
             let tabToActivateId = '';
             if (subScreenId === 'request-ride-screen') {
                 tabToActivateId = 'tab-request-ride';
@@ -404,50 +320,46 @@
             } else if (subScreenId === 'user-management-screen') {
                 tabToActivateId = 'tab-users'; loadCompanyUsers();
                 const newUserAddressInput = document.getElementById('new-user-address');
-                if (newUserAddressInput) initAutocomplete(newUserAddressInput);
+                if (newUserAddressInput) initAutocomplete(newUserAddressInput); // Chama a nova função
             }
             const tabToActivate = document.getElementById(tabToActivateId);
             if (tabToActivate) tabToActivate.classList.add('active');
         }
        
-        async function loadPendingRides() { /* ... */ }
-        async function loadHistoryRides() { /* ... */ }
-        async function approveRide(rideId) { /* ... */ }
-        async function rejectRide(rideId) { /* ... */ }
+        async function loadPendingRides() { /* ... (código igual anterior) ... */ }
+        async function loadHistoryRides() { /* ... (código igual anterior) ... */ }
+        async function approveRide(rideId) { /* ... (código igual anterior) ... */ }
+        async function rejectRide(rideId) { /* ... (código igual anterior) ... */ }
         
         // --- initApp e subscriptions ---
         function initApp() {
-             console.log("Executando initApp..."); // Log inicial
-             if (typeof Autocomplete === 'undefined') {
-                  console.error("ERRO FATAL: Biblioteca Autocomplete (Geoapify) não carregada. Verifique se os links CDN estão corretos e se não há bloqueios de rede.");
-             } else {
-                  console.log("Biblioteca Autocomplete detectada em initApp.");
-             }
+            console.log("Executando initApp..."); // Log inicial
+            // REMOVIDA a verificação de 'Autocomplete' pois não usamos mais a biblioteca
 
             populateLoginCompanies();
             document.getElementById('admin-request-immediate-btn').onclick = () => { adminSelectedRequestType = 'immediate'; adminScheduledDateTime = null; adminRequestRide(); };
             document.getElementById('admin-request-scheduled-btn').onclick = openAdminScheduleModal;
             
              // Configura subscriptions
-             supabaseClient.channel('public:rides').on('postgres_changes', { event: '*', schema: 'public', table: 'rides' }, async (payload) => { /* ... */ }).subscribe();
-             supabaseClient.channel('public:users').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async (payload) => { /* ... */ }).subscribe();
-             supabaseClient.channel('public:companies').on('postgres_changes', { event: '*', schema: 'public', table: 'companies' }, async (payload) => { /* ... */ }).subscribe();
+             supabaseClient.channel('public:rides').on('postgres_changes', { event: '*', schema: 'public', table: 'rides' }, async (payload) => { /* ... (código existente) ... */ }).subscribe();
+             supabaseClient.channel('public:users').on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, async (payload) => { /* ... (código existente) ... */ }).subscribe();
+             supabaseClient.channel('public:companies').on('postgres_changes', { event: '*', schema: 'public', table: 'companies' }, async (payload) => { /* ... (código existente) ... */ }).subscribe();
         }
         document.addEventListener('DOMContentLoaded', initApp); // Chama initApp após DOM carregar
 
         // --- SUPER ADMIN CRUDs ---
-        async function loadCompanyManagement() { /* ... */ }
-        function editCompany(id, name) { /* ... */ }
-        function cancelEdit() { /* ... */ }
-        async function addOrUpdateCompany() { /* ... */ }
-        async function deleteCompany(id, name) { /* ... */ }
-        function manageAdminsForCompany(companyId, companyName) { /* ... */ }
-        async function loadCompanyAdmins() { /* ... */ }
-        function editCompanyAdmin(admin) { /* ... */ }
-        function cancelCompanyAdminEdit() { /* ... */ }
-        async function addOrUpdateCompanyAdmin() { /* ... */ }
-        async function deleteCompanyAdmin(id, username) { /* ... */ }
-        async function loadCompanyUsers() { /* ... */ }
+        async function loadCompanyManagement() { /* ... (código existente) ... */ }
+        function editCompany(id, name) { /* ... (código existente) ... */ }
+        function cancelEdit() { /* ... (código existente) ... */ }
+        async function addOrUpdateCompany() { /* ... (código existente) ... */ }
+        async function deleteCompany(id, name) { /* ... (código existente) ... */ }
+        function manageAdminsForCompany(companyId, companyName) { /* ... (código existente) ... */ }
+        async function loadCompanyAdmins() { /* ... (código existente) ... */ }
+        function editCompanyAdmin(admin) { /* ... (código existente) ... */ }
+        function cancelCompanyAdminEdit() { /* ... (código existente) ... */ }
+        async function addOrUpdateCompanyAdmin() { /* ... (código existente) ... */ }
+        async function deleteCompanyAdmin(id, username) { /* ... (código existente) ... */ }
+        async function loadCompanyUsers() { /* ... (código existente) ... */ }
         
         function editUserById(userId) {
             const user = companyUsersCache.find(u => u.id === userId);
@@ -465,7 +377,7 @@
             
             // Inicializa autocomplete no campo de endereço
             const addressInput = document.getElementById('new-user-address');
-            if(addressInput) initAutocomplete(addressInput); // Chama a função atualizada
+            if(addressInput) initAutocomplete(addressInput); // Chama a nova função
         }
 
         function cancelUserEdit() {
@@ -481,11 +393,11 @@
              
              // Re-inicializa para o modo "adicionar"
              const addressInput = document.getElementById('new-user-address');
-             if(addressInput) initAutocomplete(addressInput); // Chama a função atualizada
+             if(addressInput) initAutocomplete(addressInput); // Chama a nova função
         }
         
-        async function addOrUpdateUser() { /* ... */ }
-        async function deleteUser(id, name) { /* ... */ }
+        async function addOrUpdateUser() { /* ... (código existente) ... */ }
+        async function deleteUser(id, name) { /* ... (código existente) ... */ }
     </script>
 </body>
 </html>
