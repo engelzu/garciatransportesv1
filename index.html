@@ -136,9 +136,9 @@
     <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
         <div class="mb-4 w-full flex justify-center">
             <div class="w-full max-w-xs md:max-w-md">
-                <img 
-                    src="./images/logogarcia.jpeg" 
-                    alt="Logo Garcia Transportes" 
+                <img
+                    src="./images/logogarcia.jpeg"
+                    alt="Logo Garcia Transportes"
                     class="w-full h-auto"
                     loading="eager"
                     onerror="this.onerror=null; this.src='https://picsum.photos/300/100?random=1&grayscale';"
@@ -147,22 +147,22 @@
         </div>
 
         <div class="w-full max-w-md px-4" style="margin-top: 3rem;">
-            <a href="https://garciatransportesguaiba.vercel.app/admin.html" 
+            <a href="https://garciatransportesv1.vercel.app/admin.html"
                class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl" style="margin-bottom: 0.75rem;">
                 <i class="fas fa-user-shield mr-2"></i> ADMIN
             </a>
-            
-            <a href="https://garciatransportesguaiba.vercel.app/motorista.html" 
+
+            <a href="https://garciatransportesv1.vercel.app/motorista.html"
                class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl" style="margin-bottom: 0.75rem;">
                 <i class="fas fa-car mr-2"></i> MOTORISTA
             </a>
-            
-            <a href="https://garciatransportesguaiba.vercel.app/passageiro.html" 
+
+            <a href="https://garciatransportesv1.vercel.app/passageiro.html"
                class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl" style="margin-bottom: 0.75rem;">
                 <i class="fas fa-user mr-2"></i> PASSAGEIRO
             </a>
 
-            <a href="https://garciatransportesguaiba.vercel.app/ADMIN_EMPRESA.html" 
+            <a href="https://garciatransportesv1.vercel.app/ADMIN_EMPRESA.html"
                class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl">
                 <i class="fas fa-building mr-2"></i> ADMINISTRADOR EMPRESAS
             </a>
@@ -187,7 +187,8 @@
             }, 1000);
 
             // Remove any existing clicked state when page loads
-            document.querySelectorAll('a[href*="garciatransportesguaiba"]').forEach(link => {
+            // Atualizado para o novo domínio
+            document.querySelectorAll('a[href*="garciatransportesv1"]').forEach(link => {
                 delete link.dataset.clicked;
             });
 
