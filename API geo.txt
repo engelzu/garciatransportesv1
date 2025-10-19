@@ -1,0 +1,11 @@
+
+3bd73ecada1d478a8c9473ad4115be38
+
+Geocoding API
+https://api.geoapify.com/v1/geocode/search?text=38%20Upper%20Montagu%20Street%2C%20Westminster%20W1H%201LJ%2C%20United%20Kingdom&apiKey=3bd73ecada1d478a8c9473ad4115be38
+
+Routing API
+https://api.geoapify.com/v1/routing?waypoints=50.96209827745463%2C4.414458883409225%7C50.429137079078345%2C5.00088081232559&mode=drive&apiKey=3bd73ecada1d478a8c9473ad4115be38
+
+Maps Tiles
+https://maps.geoapify.com/v1/tile/carto/{z}/{x}/{y}.png?&apiKey=3bd73ecada1d478a8c9473ad4115be38

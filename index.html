@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garcia Transportes</title>
+    <meta name="description" content="Sistema de transporte Garcia Transportes">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000000;
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 1rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        .py-8 {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-col {
+            flex-direction: column;
+        }
+        .items-center {
+            align-items: center;
+        }
+        .justify-center {
+            justify-content: center;
+        }
+        .min-h-screen {
+            min-height: 100vh;
+        }
+        .mb-12 {
+            margin-bottom: 3rem;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .max-w-xs {
+            max-width: 20rem;
+        }
+        .max-w-md {
+            max-width: 28rem;
+        }
+        .max-w-xs {
+            max-width: 20rem;
+        }
+        .space-y-6 > * + * {
+            margin-top: 1.5rem;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-lg {
+            font-size: 1.125rem;
+        }
+        .text-xl {
+            font-size: 1.25rem;
+        }
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        .text-gray-400 {
+            color: rgba(156, 163, 175);
+        }
+        .font-bold {
+            font-weight: 700;
+        }
+        .block {
+            display: block;
+        }
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+        .px-6 {
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+        .mt-12 {
+            margin-top: 3rem;
+        }
+        .btn-gold {
+            background-color: #FFD700;
+            transition: all 0.3s ease;
+        }
+        .btn-gold:hover {
+            background-color: #FFC000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(255, 215, 0, 0.3);
+        }
+        @media (min-width: 768px) {
+            .md\:max-w-md {
+                max-width: 28rem;
+            }
+            .md\:text-xl {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen">
+        <div class="mb-4 w-full flex justify-center">
+            <div class="w-full max-w-xs md:max-w-md">
+                <img 
+                    src="./images/logogarcia.jpeg" 
+                    alt="Logo Garcia Transportes" 
+                    class="w-full h-auto"
+                    loading="eager"
+                    onerror="this.onerror=null; this.src='https://picsum.photos/300/100?random=1&grayscale';"
+                />
+            </div>
+        </div>
+
+        <div class="w-full max-w-md px-4" style="margin-top: 3rem;">
+            <a href="https://garciatransportesguaiba.vercel.app/admin.html" 
+               class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl" style="margin-bottom: 0.75rem;">
+                <i class="fas fa-user-shield mr-2"></i> ADMIN
+            </a>
+            
+            <a href="https://garciatransportesguaiba.vercel.app/motorista.html" 
+               class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl" style="margin-bottom: 0.75rem;">
+                <i class="fas fa-car mr-2"></i> MOTORISTA
+            </a>
+            
+            <a href="https://garciatransportesguaiba.vercel.app/passageiro.html" 
+               class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl" style="margin-bottom: 0.75rem;">
+                <i class="fas fa-user mr-2"></i> PASSAGEIRO
+            </a>
+
+            <a href="https://garciatransportesguaiba.vercel.app/ADMIN_EMPRESA.html" 
+               class="block w-full btn-gold text-black font-bold py-4 px-6 rounded-lg text-center text-lg md:text-xl">
+                <i class="fas fa-building mr-2"></i> ADMINISTRADOR EMPRESAS
+            </a>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-400 text-sm">
+            <p>Garcia Transportes</p>
+            <p class="mt-2">© 2025 Todos os direitos reservados.</p>
+            <p class="mt-2">Desenvolvido por Luciano Engel 51997403703</p>
+        </footer>
+    </div>
+
+    <script>
+        // Fallback para o logo caso não carregue
+        document.addEventListener('DOMContentLoaded', function() {
+            const logo = document.querySelector('img[alt="Logo Garcia Transportes"]');
+            setTimeout(() => {
+                if (logo.naturalWidth === 0) {
+                    logo.src = 'https://picsum.photos/300/100?random=1&grayscale';
+                    logo.alt = 'Logo padrão Garcia Transportes';
+                }
+            }, 1000);
+
+            // Remove any existing clicked state when page loads
+            document.querySelectorAll('a[href*="garciatransportesguaiba"]').forEach(link => {
+                delete link.dataset.clicked;
+            });
+
+        });
+    </script>
+</body>
+</html>
