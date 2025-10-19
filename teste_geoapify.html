@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste Autocomplete Geoapify</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@latest/dist/themes/minimal.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@latest/dist/index.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/themes/minimal.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
 
     <style>
         /* Estilos CSS (permanecem os mesmos) */
@@ -23,6 +23,7 @@
     </style>
 </head>
 <body>
+
     <div class="container">
         <h1 style="text-align: center; margin-bottom: 30px;">Teste Geoapify Autocomplete</h1>
         <div class="autocomplete-container">
@@ -38,49 +39,55 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const geoapifyApiKey = '3bd73ecada1d478a8c9473ad4115be38';
-            const origemInput = document.getElementById('origem');
-            const destinoInput = document.getElementById('destino');
-            const resultOrigem = document.getElementById('result-origem');
-            const resultDestino = document.getElementById('result-destino');
+        // Este script agora executa DEPOIS que todo o HTML foi lido
+        // e DEPOIS que o script da biblioteca (no head) foi baixado e executado.
 
-            // Verifica diretamente após DOMContentLoaded, confiando no 'defer'
-            // Adicionamos um pequeno delay extra para garantir
-            setTimeout(() => {
-                if (typeof Autocomplete !== 'undefined') {
-                    console.log("Biblioteca Autocomplete DEFINIDA. Inicializando...");
+        const geoapifyApiKey = '3bd73ecada1d478a8c9473ad4115be38';
+        const origemInput = document.getElementById('origem');
+        const destinoInput = document.getElementById('destino');
+        const resultOrigem = document.getElementById('result-origem');
+        const resultDestino = document.getElementById('result-destino');
 
-                    try {
-                        // Inicializa para o campo Origem
-                        const autocompleteOrigem = new Autocomplete(origemInput, {
-                            apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt', placeholder: origemInput.placeholder
-                        });
-                        autocompleteOrigem.on('select', (feature) => {
-                            resultOrigem.textContent = feature ? `Selecionado: ${feature.properties.formatted} (Lat: ${feature.properties.lat}, Lon: ${feature.properties.lon})` : '';
-                        });
-                        console.log("Autocomplete inicializado para Origem.");
-                    } catch (e) { console.error("Erro ao inicializar autocomplete para Origem:", e); }
+        // Verifica se Autocomplete existe AGORA (deve existir se o script no head carregou)
+        if (typeof Autocomplete !== 'undefined') {
+            console.log("Biblioteca Autocomplete DEFINIDA no final do body. Inicializando...");
 
-                    try {
-                        // Inicializa para o campo Destino
-                        const autocompleteDestino = new Autocomplete(destinoInput, {
-                            apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt', placeholder: destinoInput.placeholder
-                        });
-                        autocompleteDestino.on('select', (feature) => {
-                             resultDestino.textContent = feature ? `Selecionado: ${feature.properties.formatted} (Lat: ${feature.properties.lat}, Lon: ${feature.properties.lon})` : '';
-                        });
-                        console.log("Autocomplete inicializado para Destino.");
-                    } catch (e) { console.error("Erro ao inicializar autocomplete para Destino:", e); }
+            try {
+                // Inicializa para o campo Origem
+                const autocompleteOrigem = new Autocomplete(origemInput, {
+                    apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt', placeholder: origemInput.placeholder
+                });
+                autocompleteOrigem.on('select', (feature) => {
+                    resultOrigem.textContent = feature ? `Selecionado: ${feature.properties.formatted} (Lat: ${feature.properties.lat}, Lon: ${feature.properties.lon})` : '';
+                });
+                console.log("Autocomplete inicializado para Origem.");
+            } catch (e) {
+                console.error("Erro ao inicializar autocomplete para Origem:", e);
+                resultOrigem.textContent = "Erro ao inicializar autocomplete para Origem.";
+             }
 
-                } else {
-                    console.error("ERRO PÓS-DOMContentLoaded: A biblioteca Autocomplete do Geoapify NÃO está definida.");
-                    resultOrigem.textContent = "ERRO PÓS-DOMContentLoaded: A biblioteca Autocomplete do Geoapify não foi carregada.";
-                    alert("Erro PÓS-DOMContentLoaded ao carregar a biblioteca. Verifique console/network.");
-                }
-            }, 150); // Aumentei ligeiramente o delay para 150ms
+            try {
+                // Inicializa para o campo Destino
+                const autocompleteDestino = new Autocomplete(destinoInput, {
+                    apiKey: geoapifyApiKey, filter: { countrycode: ['br'] }, lang: 'pt', placeholder: destinoInput.placeholder
+                });
+                autocompleteDestino.on('select', (feature) => {
+                     resultDestino.textContent = feature ? `Selecionado: ${feature.properties.formatted} (Lat: ${feature.properties.lat}, Lon: ${feature.properties.lon})` : '';
+                });
+                console.log("Autocomplete inicializado para Destino.");
+            } catch (e) {
+                 console.error("Erro ao inicializar autocomplete para Destino:", e);
+                 resultDestino.textContent = "Erro ao inicializar autocomplete para Destino.";
+            }
 
-        }); // Fim do DOMContentLoaded listener
+        } else {
+            // Se ainda não estiver definido aqui, o problema é mais sério (falha no download/execução do script da lib)
+            console.error("ERRO GRAVE: A biblioteca Autocomplete do Geoapify NÃO está definida mesmo no final do body.");
+            resultOrigem.textContent = "ERRO GRAVE: A biblioteca Autocomplete do Geoapify não foi carregada.";
+            alert("Erro GRAVE ao carregar a biblioteca. Verifique console/network.");
+        }
+
     </script>
+
 </body>
 </html>
