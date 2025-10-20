@@ -9,14 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/themes/minimal.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@geoapify/geocoder-autocomplete@2.0.1/dist/index.min.js"></script>
-
-
-
-
-
     
     <style>
         body, html { background-color: #000; }
@@ -37,46 +29,58 @@
         #app-container { position: relative; }
         #admin-access-icon:hover svg { stroke: #fff; }
 
-        /* ESTILO PARA O AUTOCOMPLETE DO GEOAPIFY */
-
-        
-
-
-
-
-        .geoapify-autocomplete-input {
-             color: white !important;
-             background-color: #374151 !important;
-             border: 1px solid #4b5563 !important;
-             padding: 0.5rem !important; /* Ajustado para p-2 */
-             border-radius: 0.5rem !important; /* rounded-lg */
-             width: 100% !important; /* Garante largura total */
-             box-sizing: border-box !important;
-        }
-        .geoapify-autocomplete-items {
-            background-color: #374151 !important;
-            border: 1px solid #4b5563 !important;
-            color: white !important;
-            z-index: 1050 !important; /* Garante que fique sobre outros elementos */
-            max-height: 200px; /* Limita altura */
-            overflow-y: auto; /* Adiciona scroll se necessário */
-        }
-        .geoapify-autocomplete-items div:hover {
-            background-color: #4b5563 !important;
-        }
-        .geoapify-autocomplete-item {
-             color: white !important;
-             padding: 8px !important;
-             font-size: 14px !important;
-        }
-        .geoapify-autocomplete-item.active {
-            background-color: #00ffff !important; /* Ciano para item selecionado */
-            color: black !important; /* Texto preto para contraste */
-        }
+        /* ESTILO PARA O AUTOCOMPLETE (CUSTOMIZADO, IGUAL AO 'mapa.html') */
         .autocomplete-container { /* Container para posicionamento */
             position: relative;
         }
-        /* FIM DO ESTILO DO AUTOCOMPLETE */
+        
+        .autocomplete-list {
+            position: absolute;
+            top: 100%; /* Posiciona abaixo do input */
+            left: 0;
+            right: 0;
+            background: #374151; /* Fundo escuro do admin */
+            border: 1px solid #4b5563; /* Borda do admin */
+            border-top: none;
+            border-radius: 0 0 0.5rem 0.5rem; /* rounded-lg */
+            max-height: 200px; /* Altura máxima */
+            overflow-y: auto;
+            z-index: 1050; /* Sobrepor tudo */
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .autocomplete-list.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #4b5563; /* Separador escuro */
+            color: white !important; /* Texto branco */
+            transition: background-color 0.2s ease;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #4b5563; /* Hover mais claro */
+        }
+
+        .autocomplete-item strong {
+            color: #00ffff; /* Cor ciano de destaque */
+        }
+
+        .loading, .no-results {
+            padding: 10px 12px;
+            text-align: center;
+            color: #9ca3af; /* Cinza claro */
+            font-style: italic;
+        }
+        /* FIM DO ESTILO CUSTOMIZADO */
 
         #schedule-modal { display: none; }
         #schedule-modal.flex { display: flex; }
@@ -184,9 +188,13 @@
                     <div class="space-y-2">
                         <input type="text" id="new-user-matricula" placeholder="Matrícula" class="w-full p-2 rounded-lg">
                         <input type="text" id="new-user-name" placeholder="Nome Completo" class="w-full p-2 rounded-lg">
+                        
                         <div class="autocomplete-container">
-                             <input type="text" id="new-user-address" placeholder="Endereço" class="w-full p-2 rounded-lg">
+                             <input type="text" id="new-user-address" placeholder="Endereço" class="w-full p-2 rounded-lg"
+                                    oninput="handleAddressInput(event, 'new-user-addressList')">
+                             <div class="autocomplete-list" id="new-user-addressList"></div>
                         </div>
+                        
                         <input type="tel" id="new-user-phone" placeholder="Telefone" class="w-full p-2 rounded-lg">
                         <input type="text" id="new-user-password" placeholder="Senha" class="w-full p-2 rounded-lg">
                     </div>
@@ -251,50 +259,108 @@
         let adminScheduledDateTime = null;
         let companyUsersCache = [];
         let currentManagingCompany = { id: null, name: null };
+        let debounceTimer; // Adicionado para o autocomplete manual
 
 
         // ========================================================================
-        // FUNÇÃO ATUALIZADA - initAutocomplete (Usa Geoapify)
+        // NOVAS FUNÇÕES (do mapa.html) - LÓGICA DE AUTOCOMPLETE MANUAL
         // ========================================================================
-        function initAutocomplete(inputElement) {
-            // Verifica se o elemento existe e se a biblioteca Autocomplete está carregada
-            if (!inputElement || typeof Autocomplete === 'undefined') {
-                //console.warn("initAutocomplete: Elemento não encontrado ou biblioteca não carregada.", inputElement);
+        
+        // Função para lidar com a digitação e aplicar debounce
+        function handleAddressInput(event, listId) {
+            clearTimeout(debounceTimer);
+            const query = event.target.value;
+            debounceTimer = setTimeout(() => {
+                searchAddress(query, listId);
+            }, 300); // 300ms de debounce
+        }
+
+        async function searchAddress(query, listId) {
+            if (query.length < 3) {
+                hideList(listId);
                 return;
             }
 
-            // Remove instância anterior para evitar duplicatas, se existir
-            if (inputElement.geoapify_autocomplete_instance) {
-                try {
-                    inputElement.geoapify_autocomplete_instance.destroy();
-                } catch(e) { console.warn("Erro ao destruir instância anterior do autocomplete:", e); }
-                inputElement.geoapify_autocomplete_instance = null;
-            }
+            const list = document.getElementById(listId);
+            if (!list) return; // Segurança
+            list.innerHTML = '<div class="loading">Buscando...</div>';
+            list.classList.add('show');
 
             try {
-                const autocomplete = new Autocomplete(inputElement, {
-                    apiKey: GEOAPIFY_API_KEY,
-                    filter: { countrycode: ['br'] },
-                    lang: 'pt',
-                    placeholder: inputElement.placeholder,
-                    allowNonVerifiedHouseNumber: true,
-                    allowNonVerifiedStreet: true
-                });
-
-                // Guarda a instância no elemento para referência futura
-                inputElement.geoapify_autocomplete_instance = autocomplete;
-
-                // Opcional: Adicionar listener se precisar dos dados selecionados
-                // autocomplete.on('select', (feature) => {
-                //     if (feature) {
-                //         console.log("Local selecionado:", feature.properties);
-                //     }
-                // });
-
+                // Usa a chave API já definida
+                const response = await fetch(
+                    `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&lang=pt&limit=5&apiKey=${GEOAPIFY_API_KEY}`
+                );
+                
+                const data = await response.json();
+                
+                if (data.features && data.features.length > 0) {
+                    displayResults(data.features, listId);
+                } else {
+                    list.innerHTML = '<div class="no-results">Nenhum resultado encontrado</div>';
+                }
             } catch (error) {
-                console.error("Erro ao inicializar Geoapify Autocomplete:", error, "no elemento:", inputElement);
+                console.error('Erro ao buscar endereços:', error);
+                list.innerHTML = '<div class="no-results">Erro ao buscar endereços</div>';
             }
         }
+
+        function displayResults(features, listId) {
+            const list = document.getElementById(listId);
+            if (!list) return; // Segurança
+            list.innerHTML = '';
+
+            features.forEach(feature => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                
+                const formatted = feature.properties.formatted;
+                const city = feature.properties.city || '';
+                const state = feature.properties.state || '';
+                
+                item.innerHTML = `
+                    <strong>${formatted}</strong>
+                    ${city || state ? `<br><small style="color: #999;">${city}${city && state ? ', ' : ''}${state}</small>` : ''}
+                `;
+                
+                // Modificado para chamar a nova 'selectAddress'
+                item.onclick = () => selectAddress(feature, listId);
+                list.appendChild(item);
+            });
+
+            list.classList.add('show');
+        }
+
+        // Função 'selectAddress' ADAPTADA para o admin
+        function selectAddress(feature, listId) {
+            const inputId = listId.replace('List', ''); // Ex: 'address-input-0List' -> 'address-input-0'
+            const input = document.getElementById(inputId);
+            
+            if (input) {
+                input.value = feature.properties.formatted; // Apenas preenche o input
+            }
+            hideList(listId); // Esconde a lista
+        }
+
+        function hideList(listId) {
+            const list = document.getElementById(listId);
+            if (list) {
+                list.classList.remove('show');
+            }
+        }
+
+        // Fechar listas ao clicar fora (copiado do mapa.html)
+        document.addEventListener('click', function(e) {
+            // Se o clique NÃO for dentro de um container de autocomplete
+            if (!e.target.closest('.autocomplete-container')) {
+                // Esconde todas as listas de autocomplete
+                document.querySelectorAll('.autocomplete-list').forEach(list => list.classList.remove('show'));
+            }
+        });
+        // ========================================================================
+        // FIM DAS NOVAS FUNÇÕES
+        // ========================================================================
+
 
         // ========================================================================
         // FUNÇÃO ATUALIZADA - parseDestinations (Lida com o novo formato JSON)
@@ -480,7 +546,7 @@
         }
 
         // ========================================================================
-        // FUNÇÃO CORRIGIDA - handlePassengerQuantityChange (Usa requestAnimationFrame)
+        // FUNÇÃO CORRIGIDA - handlePassengerQuantityChange (Usa implementação manual)
         // ========================================================================
         function handlePassengerQuantityChange(event) {
             const quantity = parseInt(event.target.value, 10);
@@ -517,7 +583,9 @@
                         </div>
                         <div class="autocomplete-container">
                             <label for="address-input-${i}" class="block mb-1 text-xs font-medium">Endereço</label>
-                            <input type="text" id="address-input-${i}" class="w-full p-2 rounded-lg" placeholder="Endereço autocompletado ou manual">
+                            <input type="text" id="address-input-${i}" class="w-full p-2 rounded-lg" placeholder="Endereço autocompletado ou manual"
+                                   oninput="handleAddressInput(event, 'address-input-${i}List')">
+                            <div class="autocomplete-list" id="address-input-${i}List"></div>
                         </div>
                     </div>
                 `;
@@ -528,7 +596,9 @@
                     <p class="font-semibold text-md mb-2 text-cyan-400">Destino Final</p>
                     <div class="autocomplete-container">
                         <label for="address-input-destination" class="block mb-1 text-xs font-medium">Endereço de Destino</label>
-                        <input type="text" id="address-input-destination" class="w-full p-2 rounded-lg" placeholder="Digite o endereço de destino da viagem">
+                        <input type="text" id="address-input-destination" class="w-full p-2 rounded-lg" placeholder="Digite o endereço de destino da viagem"
+                               oninput="handleAddressInput(event, 'address-input-destinationList')">
+                        <div class="autocomplete-list" id="address-input-destinationList"></div>
                     </div>
                 </div>
             `;
@@ -536,33 +606,13 @@
             // Adiciona o HTML ao container de uma vez
             container.innerHTML = inputsHtml;
 
-            // ---- MODIFICAÇÃO PRINCIPAL AQUI ----
-            // Usa requestAnimationFrame para inicializar o autocomplete após o DOM atualizar
-            requestAnimationFrame(() => {
-                console.log("Inicializando autocompletes após renderização..."); // Log de depuração
-                // Inicializa autocomplete para todos os inputs de endereço criados
-                for (let i = 0; i < quantity; i++) {
-                    const inputElement = document.getElementById(`address-input-${i}`);
-                    if (inputElement) {
-                         initAutocomplete(inputElement);
-                    } else {
-                         console.error(`Elemento address-input-${i} não encontrado após renderização.`);
-                    }
-                }
-                const destInputElement = document.getElementById('address-input-destination');
-                 if (destInputElement) {
-                     initAutocomplete(destInputElement);
-                 } else {
-                     console.error("Elemento address-input-destination não encontrado após renderização.");
-                 }
-
-                 // Adiciona listener para autocompletar endereço ao selecionar colaborador DEPOIS que os selects existem
-                 document.querySelectorAll('.collaborator-selector').forEach(select => {
-                    // Remove listener antigo para evitar duplicatas
-                    select.removeEventListener('change', handleCollaboratorSelection);
-                    select.addEventListener('change', handleCollaboratorSelection);
-                 });
-            });
+            // ---- MODIFICAÇÃO ----
+            // Adiciona listener para autocompletar endereço ao selecionar colaborador
+             document.querySelectorAll('.collaborator-selector').forEach(select => {
+                // Remove listener antigo para evitar duplicatas
+                select.removeEventListener('change', handleCollaboratorSelection);
+                select.addEventListener('change', handleCollaboratorSelection);
+             });
              // ---- FIM DA MODIFICAÇÃO ----
         }
 
@@ -776,8 +826,7 @@
                 case 'user-management-screen':
                     tabToActivateId = 'tab-users';
                     loadCompanyUsers(); // Carrega dados ao mostrar a aba
-                    // Inicializa autocomplete no form de adicionar/editar usuário
-                    initAutocomplete(document.getElementById('new-user-address'));
+                    // A chamada initAutocomplete foi removida daqui
                     break;
             }
             const tabToActivate = document.getElementById(tabToActivateId);
@@ -1377,8 +1426,7 @@
             document.getElementById('user-form-title').textContent = 'Editar Usuário';
             window.scrollTo(0, 0); // Rola para o topo
 
-             // Inicializa o autocomplete no campo de endereço
-             initAutocomplete(document.getElementById('new-user-address'));
+             // A chamada initAutocomplete foi removida daqui
         }
 
         function cancelUserEdit() {
@@ -1395,16 +1443,7 @@
             document.getElementById('cancel-user-edit-btn').classList.add('hidden');
             document.getElementById('user-form-title').textContent = 'Adicionar Usuário';
 
-            // Remove a instância do autocomplete para evitar problemas
-             const addressInput = document.getElementById('new-user-address');
-             if (addressInput && addressInput.geoapify_autocomplete_instance) {
-                 try {
-                    addressInput.geoapify_autocomplete_instance.destroy();
-                 } catch(e) { console.warn("Erro ao destruir autocomplete no cancelamento:", e); }
-                 addressInput.geoapify_autocomplete_instance = null;
-             }
-             // Re-inicializa para o modo "adicionar"
-             initAutocomplete(addressInput);
+            // Bloco de limpeza do autocomplete foi removido daqui
         }
 
 
