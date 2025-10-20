@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Endereços com Autocomplete</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .autocomplete-list.show {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f5f5ff;
+        }
+
+        .autocomplete-item strong {
+            color: #667eea;
+        }
+
+        .loading {
+            padding: 12px 15px;
+            text-align: center;
+            color: #999;
+            font-style: italic;
+        }
+
+        .no-results {
+            padding: 12px 15px;
+            text-align: center;
+            color: #999;
+        }
+
+        .info-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .info-box.show {
+            display: block;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+
+        .clear-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 20px;
+            display: none;
+        }
+
+        .clear-btn.show {
+            display: block;
+        }
+
+        .clear-btn:hover {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Busca de Endereços</h1>
+        
+        <div class="input-group">
+            <label for="origem">Endereço de Origem</label>
+            <input type="text" id="origem" placeholder="Digite o endereço de origem...">
+            <button class="clear-btn" id="clearOrigem" onclick="clearInput('origem')">×</button>
+            <div class="autocomplete-list" id="origemList"></div>
+        </div>
+
+        <div class="input-group">
+            <label for="destino">Endereço de Destino</label>
+            <input type="text" id="destino" placeholder="Digite o endereço de destino...">
+            <button class="clear-btn" id="clearDestino" onclick="clearInput('destino')">×</button>
+            <div class="autocomplete-list" id="destinoList"></div>
+        </div>
+
+        <div class="info-box" id="origemInfo"></div>
+        <div class="info-box" id="destinoInfo"></div>
+    </div>
+
+    <script>
+        const API_KEY = '9452fa947c234c90b794bf2d1b8c5eb4';
+        let debounceTimer;
+
+        // Função para buscar endereços
+        async function searchAddress(query, listId) {
+            if (query.length < 3) {
+                hideList(listId);
+                return;
+            }
+
+            const list = document.getElementById(listId);
+            list.innerHTML = '<div class="loading">Buscando...</div>';
+            list.classList.add('show');
+
+            try {
+                const response = await fetch(
+                    `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&lang=pt&limit=5&apiKey=${API_KEY}`
+                );
+                
+                const data = await response.json();
+                
+                if (data.features && data.features.length > 0) {
+                    displayResults(data.features, listId);
+                } else {
+                    list.innerHTML = '<div class="no-results">Nenhum resultado encontrado</div>';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar endereços:', error);
+                list.innerHTML = '<div class="no-results">Erro ao buscar endereços</div>';
+            }
+        }
+
+        // Função para exibir resultados
+        function displayResults(features, listId) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+
+            features.forEach(feature => {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+                
+                const formatted = feature.properties.formatted;
+                const city = feature.properties.city || '';
+                const state = feature.properties.state || '';
+                
+                item.innerHTML = `
+                    <strong>${formatted}</strong>
+                    ${city || state ? `<br><small style="color: #999;">${city}${city && state ? ', ' : ''}${state}</small>` : ''}
+                `;
+                
+                item.onclick = () => selectAddress(feature, listId);
+                list.appendChild(item);
+            });
+
+            list.classList.add('show');
+        }
+
+        // Função para selecionar endereço
+        function selectAddress(feature, listId) {
+            const inputId = listId.replace('List', '');
+            const input = document.getElementById(inputId);
+            const infoBoxId = inputId + 'Info';
+            const infoBox = document.getElementById(infoBoxId);
+            
+            input.value = feature.properties.formatted;
+            hideList(listId);
+            showClearButton(inputId);
+
+            // Exibir informações detalhadas
+            const props = feature.properties;
+            infoBox.innerHTML = `
+                <h3>📍 Endereço Selecionado</h3>
+                <p><strong>Endereço:</strong> ${props.formatted}</p>
+                ${props.street ? `<p><strong>Rua:</strong> ${props.street}</p>` : ''}
+                ${props.housenumber ? `<p><strong>Número:</strong> ${props.housenumber}</p>` : ''}
+                ${props.city ? `<p><strong>Cidade:</strong> ${props.city}</p>` : ''}
+                ${props.state ? `<p><strong>Estado:</strong> ${props.state}</p>` : ''}
+                ${props.postcode ? `<p><strong>CEP:</strong> ${props.postcode}</p>` : ''}
+                ${props.country ? `<p><strong>País:</strong> ${props.country}</p>` : ''}
+                <p><strong>Coordenadas:</strong> ${feature.geometry.coordinates[1].toFixed(6)}, ${feature.geometry.coordinates[0].toFixed(6)}</p>
+            `;
+            infoBox.classList.add('show');
+        }
+
+        // Função para esconder lista
+        function hideList(listId) {
+            const list = document.getElementById(listId);
+            list.classList.remove('show');
+        }
+
+        // Função para mostrar botão de limpar
+        function showClearButton(inputId) {
+            document.getElementById('clear' + inputId.charAt(0).toUpperCase() + inputId.slice(1)).classList.add('show');
+        }
+
+        // Função para limpar input
+        function clearInput(inputId) {
+            const input = document.getElementById(inputId);
+            const clearBtn = document.getElementById('clear' + inputId.charAt(0).toUpperCase() + inputId.slice(1));
+            const infoBox = document.getElementById(inputId + 'Info');
+            
+            input.value = '';
+            clearBtn.classList.remove('show');
+            infoBox.classList.remove('show');
+            hideList(inputId + 'List');
+            input.focus();
+        }
+
+        // Event listeners para os inputs
+        document.getElementById('origem').addEventListener('input', function(e) {
+            clearTimeout(debounceTimer);
+            if (e.target.value) {
+                showClearButton('origem');
+            } else {
+                document.getElementById('clearOrigem').classList.remove('show');
+            }
+            debounceTimer = setTimeout(() => {
+                searchAddress(e.target.value, 'origemList');
+            }, 300);
+        });
+
+        document.getElementById('destino').addEventListener('input', function(e) {
+            clearTimeout(debounceTimer);
+            if (e.target.value) {
+                showClearButton('destino');
+            } else {
+                document.getElementById('clearDestino').classList.remove('show');
+            }
+            debounceTimer = setTimeout(() => {
+                searchAddress(e.target.value, 'destinoList');
+            }, 300);
+        });
+
+        // Fechar listas ao clicar fora
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.input-group')) {
+                hideList('origemList');
+                hideList('destinoList');
+            }
+        });
+    </script>
+</body>
+</html>
